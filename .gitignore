@@ -1,0 +1,10 @@
+.en*
+.ruff_cache/
+.venv/
+__pycache__/
+*.pyc
+downloads/
+data/
+backups/
+logs/
+sync_*.json

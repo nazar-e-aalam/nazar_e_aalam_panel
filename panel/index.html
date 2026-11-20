@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Nazar-e-Aalam Admin</title>
+    <meta
+      name="description"
+      content="Nazar-e-Aalam admin panel for Islamic content, prayer times and app settings."
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#fbd9b5" />
+    <link rel="stylesheet" href="assets/css/fonts.css" />
+    <link rel="stylesheet" href="assets/css/style.css?v1" />
+    <link rel="icon" type="image/png" href="assets/img/favicon.png" />
+  </head>
+  <body>
+    <div id="boot-overlay" aria-live="polite" aria-busy="true">
+      <div class="boot-card glass">
+        <div class="boot-brand">
+          <img src="assets/img/logo.png" alt="" id="boot-logo" />
+          <b>Nazar-e-Aalam</b>
+          <span>Admin panel</span>
+        </div>
+        <div class="boot-spinner" aria-hidden="true">
+          <svg viewBox="0 0 50 50">
+            <circle
+              cx="25"
+              cy="25"
+              r="20"
+              fill="none"
+              stroke-width="4"
+              stroke="rgba(130,60,10,.15)"
+            />
+            <circle
+              cx="25"
+              cy="25"
+              r="20"
+              fill="none"
+              stroke-width="4"
+              stroke="url(#bootGrad)"
+              stroke-linecap="round"
+              pathLength="100"
+              stroke-dasharray="100"
+              stroke-dashoffset="70"
+            >
+              <animateTransform
+                attributeName="transform"
+                type="rotate"
+                from="0 25 25"
+                to="360 25 25"
+                dur="1s"
+                repeatCount="indefinite"
+              />
+            </circle>
+            <defs>
+              <linearGradient id="bootGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#ffa03f" />
+                <stop offset="1" stop-color="#e4530b" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="boot-status" id="boot-status">Connecting to server…</div>
+      </div>
+    </div>
+    <div class="bgfx" aria-hidden="true">
+      <div class="au a1"></div>
+      <div class="au a2"></div>
+    </div>
+    <div class="scrim" data-act="menu" aria-hidden="true"></div>
+
+    <div id="app">
+      <aside class="glass" id="side">
+        <div class="brand">
+          <img
+            id="brandImg"
+            src="assets/img/logo.png"
+            alt="Nazar-e-Aalam logo"
+          />
+          <div>
+            <b id="brandName">Nazar-e-Aalam</b
+            ><span id="brandSub">Admin panel</span>
+          </div>
+        </div>
+        <nav id="nav" aria-label="Main"></nav>
+      </aside>
+
+      <main>
+        <header class="glass">
+          <button
+            class="chip glass menu"
+            aria-label="Toggle navigation"
+            aria-controls="side"
+            aria-expanded="false"
+            title="Toggle navigation"
+            data-act="menu"
+          >
+            <svg class="i" viewBox="0 0 24 24">
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </button>
+          <h3 id="pt">Dashboard</h3>
+          <div class="sp"></div>
+          <button
+            class="chip glass"
+            aria-label="Switch language"
+            title="Switch language"
+            data-act="lang"
+          >
+            <svg class="i" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" />
+            </svg>
+            <span id="lg">العربية</span>
+          </button>
+          <div class="av glass">
+            <em id="ini">A</em><small id="un">admin</small>
+          </div>
+          <button
+            class="chip glass"
+            aria-label="Sign out"
+            title="Sign out"
+            data-act="logout"
+          >
+            <svg class="i" viewBox="0 0 24 24">
+              <path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9" />
+            </svg>
+          </button>
+        </header>
+        <div class="page" id="page" tabindex="-1"></div>
+      </main>
+    </div>
+
+    <div id="modal" aria-hidden="true"></div>
+    <div id="toasts" aria-live="polite"></div>
+    <noscript
+      ><p style="padding: 24px; font-family: sans-serif">
+        Please Enable JavaScript.
+      </p></noscript
+    >
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/app.js?v1"></script>
+  </body>
+</html>

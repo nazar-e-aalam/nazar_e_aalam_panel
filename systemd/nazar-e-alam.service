@@ -1,0 +1,36 @@
+[Unit]
+Description=Nazar-e-Aalam API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/nazar_e_aalam/admin_panel
+Environment="PATH=/home/ubuntu/nazar_e_aalam/admin_panel/.venv/bin:/usr/local/bin:/usr/bin:/bin"
+EnvironmentFile=-/home/ubuntu/nazar_e_aalam/admin_panel/.env
+
+ExecStartPre=/home/ubuntu/nazar_e_aalam/admin_panel/.venv/bin/alembic upgrade head
+ExecStart=/home/ubuntu/nazar_e_aalam/admin_panel/.venv/bin/gunicorn main:app -c gunicorn.conf.py
+
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=30
+PrivateTmp=true
+Restart=on-failure
+RestartSec=5s
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=nazar-e-alam
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/ubuntu/nazar_e_aalam/admin_panel/logs
+ReadWritePaths=/home/ubuntu/nazar_e_aalam/admin_panel/backups
+ReadWritePaths=/home/ubuntu/nazar_e_aalam/admin_panel/downloads
+
+[Install]
+WantedBy=multi-user.target
