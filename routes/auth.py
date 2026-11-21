@@ -575,22 +575,43 @@ def register_device(
         if body.app_version is not None:
             profile.app_version = body.app_version
 
-    ttl = timedelta(days=ENV.DEVICE_TOKEN_TTL_DAYS)
+    access_ttl = timedelta(
+        minutes=ENV.JWT_ACCESS_TTL_MINUTES
+    )
 
     access = create_access_token(
         subject=user.id,
         extra={
             "dev": uuid[:12],
-            "admin": user.is_admin,
+            "admin": False,
         },
-        ttl=ttl,
+        ttl=access_ttl,
+    )
+
+    # Issue refresh token using existing infrastructure.
+    raw_refresh = create_refresh_token(
+        subject=user.id,
+    )
+
+    refresh_expires_at = (
+        _utcnow_naive()
+        + timedelta(days=ENV.JWT_REFRESH_TTL_DAYS)
+    )
+
+    RefreshTokenRepository(session).issue(
+        user_id=user.id,
+        raw_token=raw_refresh,
+        expires_at=refresh_expires_at,
+        user_agent=(request.headers.get("user-agent") or "")[:255],
+        ip_address=_client_ip(request)[:45],
     )
 
     session.commit()
 
     return DeviceRegisterResponse(
         access_token=access,
-        expires_in=int(ttl.total_seconds()),
+        refresh_token=raw_refresh,
+        expires_in=int(access_ttl.total_seconds()),
         user_id=user.id,
         is_new_user=is_new_user,
     )
