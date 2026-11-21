@@ -403,23 +403,27 @@ def me(user: User = Depends(get_current_user)) -> UserOut:
     return UserOut.model_validate(user)
 
 
-@router.post("/device/register", response_model=DeviceRegisterResponse)
+@router.post(
+    "/device/register",
+    response_model=DeviceRegisterResponse,
+)
 def register_device(
     body: DeviceRegisterRequest,
     request: Request,
-    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer_optional),
+    credentials: HTTPAuthorizationCredentials | None = Depends(
+        _bearer_optional
+    ),
     session: Session = Depends(db.get_db),
 ) -> DeviceRegisterResponse:
     """
-    Register (or resume) an anonymous device.
+    Register or resume an anonymous device.
 
-    Rules:
-    - No token   + brand-new UUID      → create user, issue long-lived token
-    - No token   + UUID already exists → 401 (can't claim someone else's device)
-    - Valid token + UUID matches claim → resume, update last_seen, refresh token
-    - Valid token + UUID differs       → 403 (can't hijack another device)
-    - Any token that's revoked/expired → 401 (client must clear and try again with no token,
-                                           but that path is also blocked if UUID exists)
+    - New UUID without token: create account.
+    - Existing UUID with matching token: resume.
+    - Existing UUID without token: reject.
+    - Invalid or expired token: reject.
+    - Mismatched token/device: reject.
+    - Revoked device: reject.
     """
 
     if ENV.RATE_LIMIT_ENABLED:
@@ -428,57 +432,90 @@ def register_device(
             limit=ENV.DEVICE_REGISTER_RATE_LIMIT,
             window=60,
         )
+
         if not allowed:
             raise HTTPException(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                detail="Too many device registrations. Try again in a minute.",
+                detail=(
+                    "Too many device registrations. "
+                    "Try again in a minute."
+                ),
             )
 
     uuid = body.device_uuid.strip()
 
+    if not uuid:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="device_uuid cannot be empty.",
+        )
+
     claims = None
+
     if credentials is not None:
         try:
             claims = decode_token(
-                credentials.credentials, expected_type=TokenType.ACCESS
+                credentials.credentials,
+                expected_type=TokenType.ACCESS,
             )
         except TokenError:
-            claims = None
-
-    profile = session.query(DeviceProfile).filter_by(device_uuid=uuid).one_or_none()
-
-    if profile is None and claims is not None:
-        try:
-            _ = int(claims["sub"])
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=(
-                    "Token is present but this device is not registered to it. "
-                    "Clear your local token to start fresh."
-                ),
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid or expired access token.",
+                headers={"WWW-Authenticate": "Bearer"},
             )
-        except (KeyError, ValueError):
-            claims = None
+
+    profile = (
+        session.query(DeviceProfile)
+        .filter_by(device_uuid=uuid)
+        .one_or_none()
+    )
 
     if profile is not None and profile.revoked:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="This device has been deactivated. Contact support.",
+            detail=(
+                "This device has been deactivated. "
+                "Contact support."
+            ),
+        )
+
+    token_user_id = None
+
+    if claims is not None:
+        try:
+            token_user_id = int(claims["sub"])
+        except (KeyError, ValueError, TypeError):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Malformed access token.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        if claims.get("dev") != uuid[:12]:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Token does not belong to this device.",
+            )
+
+    if profile is None and claims is not None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                "Token is present but this device is not "
+                "registered. Clear the token to register "
+                "a new device."
+            ),
         )
 
     if profile is not None:
-        if claims is None:
+        if token_user_id is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Device is already registered. Log in or reinstall to continue.",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        try:
-            token_user_id = int(claims["sub"])
-        except (KeyError, ValueError):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Malformed token.",
+                detail=(
+                    "Device is already registered. "
+                    "A valid device token is required."
+                ),
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
@@ -488,24 +525,18 @@ def register_device(
                 detail="Token does not belong to this device.",
             )
 
-        if claims.get("dev") and claims["dev"] != uuid[:12]:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Token was issued for a different device.",
-            )
-
+    now = _utcnow_naive()
     is_new_user = False
-    guest_email = f"guest+{uuid}@device.local"
 
     if profile is None:
         user = User(
             is_admin=False,
-            email=guest_email,
-            email_verified_at=_utcnow_naive(),
+            email=f"guest+{uuid}@device.local",
+            email_verified_at=now,
         )
+
         session.add(user)
         session.flush()
-        is_new_user = True
 
         profile = DeviceProfile(
             user_id=user.id,
@@ -514,38 +545,47 @@ def register_device(
             device_model=body.device_model,
             os_version=body.os_version,
             app_version=body.app_version,
-            last_seen_at=_utcnow_naive(),
+            last_seen_at=now,
         )
+
         session.add(profile)
+        is_new_user = True
+
     else:
         user = session.get(User, profile.user_id)
-        if user is None:
-            user = User(
-                is_admin=False,
-                email=guest_email,
-                email_verified_at=_utcnow_naive(),
-            )
-            session.add(user)
-            session.flush()
-            profile.user_id = user.id
-            is_new_user = True
 
-        profile.last_seen_at = _utcnow_naive()
-        if body.platform:
-            profile.platform = body.platform
-        if body.device_model:
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=(
+                    "Device account is missing. "
+                    "Contact support."
+                ),
+            )
+
+        profile.last_seen_at = now
+        profile.platform = body.platform
+
+        if body.device_model is not None:
             profile.device_model = body.device_model
-        if body.os_version:
+
+        if body.os_version is not None:
             profile.os_version = body.os_version
-        if body.app_version:
+
+        if body.app_version is not None:
             profile.app_version = body.app_version
 
     ttl = timedelta(days=ENV.DEVICE_TOKEN_TTL_DAYS)
+
     access = create_access_token(
         subject=user.id,
-        extra={"dev": uuid[:12], "admin": user.is_admin},
+        extra={
+            "dev": uuid[:12],
+            "admin": user.is_admin,
+        },
         ttl=ttl,
     )
+
     session.commit()
 
     return DeviceRegisterResponse(

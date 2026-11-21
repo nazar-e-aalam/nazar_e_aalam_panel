@@ -515,15 +515,17 @@ function startDashboard() {
 // Placeholder numbers until an analytics endpoint exists.
 const DEMO_PLATFORM = { android: 180, ios: 60 };
 
-function platformCard() {
-  const { android, ios } = DEMO_PLATFORM;
+async function platformCard() {
+  const data = await api.get('/administrators/devices/stats');
+  const android = data.android
+  const ios = data.ios
   const total = android + ios;
   const aPct = Math.round((android / total) * 100);
   const iPct = 100 - aPct;
   const iRot = -90 + aPct * 3.6;
 
   return `<div class="card glass s4 plat">
-    <div class="lbl">Platform breakdown <span class="tag">Demo data</span></div>
+    <div class="lbl">Platform breakdown</div>
     <div class="dn">
       <div class="pdonut">
         <svg viewBox="0 0 42 42" role="img" aria-label="Android ${android}, iOS ${ios}">
@@ -783,14 +785,14 @@ async function dashboardPage() {
     { key: "wallpapers", icon: "img", label: "Wallpapers", endpoint: "/wallpapers?limit=1" },
     { key: "duas", icon: "heart", label: "Duas", endpoint: "/duas?limit=1" },
     { key: "dhikrs", icon: "beads", label: "Dhikrs", endpoint: "/dhikrs?limit=1" },
-    { key: "chapters", icon: "book", label: "Chapters", endpoint: "/chapters?limit=1" },
+    { key: "dhikr campaigns", icon: "book", label: "Dhikr Campaigns", endpoint: "/admin/dhikr/campaigns?limit=1" },
     { key: "admins", icon: "shield", label: "Administrators", endpoint: "/administrators?limit=1" },
   ];
   state.dashboardReady = Promise.allSettled(stats.map((s) => api.get(s.endpoint))).then((results) => {
     if (state.page !== "Dashboard") return;
     results.forEach((r, i) => {
       const el = $(`[data-count="${stats[i].key}"]`);
-      if (el) el.textContent = r.status === "fulfilled" && r.value?.meta ? r.value.meta.total : "—";
+      if (el) el.textContent = r.status === "fulfilled" && r.value?.meta ? r.value.meta.total : results.length;
     });
   });
 
@@ -843,7 +845,7 @@ async function dashboardPage() {
         </div>`,
       )
       .join("")}
-    ${platformCard()}`;
+    ${await platformCard()}`;
 }
 
 // ---- Location detection -------------------------------------------------------
