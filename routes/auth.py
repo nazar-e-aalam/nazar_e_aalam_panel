@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import secrets
+import threading
+import time
+from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -401,6 +404,159 @@ def logout(
 @router.get("/me", response_model=UserOut)
 def me(user: User = Depends(get_current_user)) -> UserOut:
     return UserOut.model_validate(user)
+
+
+# Debug sessions are deliberately isolated from MySQL and production JWTs.
+# IMPORTANT: this store is PER PROCESS. Use one Gunicorn worker for reliable
+# testing; worker restarts erase all sessions.
+_DEBUG_LIFETIME = 3600
+_DEBUG_ACCESS_LIFETIME = 900
+_DEBUG_MAX_SESSIONS = 500
+_DEBUG_LOCK = threading.RLock()
+
+
+@dataclass
+class _DebugSession:
+    device_uuid: str
+    user_id: int
+    email: str
+    expires_at: float
+    access_hash: str
+    refresh_hash: str
+
+
+_DEBUG_SESSIONS: dict[str, _DebugSession] = {}
+_DEBUG_SEQUENCE = 0
+_DEBUG_ACCESS_EXPIRIES: dict[str, float] = {}
+
+
+def _debug_hash(raw: str) -> str:
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
+
+
+def _debug_cleanup(now: float) -> None:
+    # Call while holding _DEBUG_LOCK. Expiration is checked on every request.
+    for key, item in list(_DEBUG_SESSIONS.items()):
+        if item.expires_at <= now:
+            _DEBUG_ACCESS_EXPIRIES.pop(item.access_hash, None)
+            del _DEBUG_SESSIONS[key]
+
+
+def _debug_issue(item: _DebugSession, now: float, *, rotate_refresh: bool) -> dict:
+    access = "dbg_a_" + secrets.token_urlsafe(48)
+    _DEBUG_ACCESS_EXPIRIES.pop(item.access_hash, None)
+    item.access_hash = _debug_hash(access)
+    _DEBUG_ACCESS_EXPIRIES[item.access_hash] = min(item.expires_at, now + _DEBUG_ACCESS_LIFETIME)
+    if rotate_refresh:
+        refresh = "dbg_r_" + secrets.token_urlsafe(48)
+        item.refresh_hash = _debug_hash(refresh)
+    else:
+        # Refresh credentials are never recoverable from their stored hash.
+        # Registration always rotates both credentials.
+        raise RuntimeError("Debug registration must rotate refresh token")
+    return {
+        "access_token": access,
+        "refresh_token": refresh,
+        "token_type": "bearer",
+        "expires_in": max(1, min(_DEBUG_ACCESS_LIFETIME, int(item.expires_at - now))),
+        "user_id": item.user_id,
+        "is_new_user": False,
+        "debug": True,
+        "email": item.email,
+        "session_expires_in": max(0, int(item.expires_at - now)),
+    }
+
+
+@router.post("/device/register/debug", response_model=None)
+def register_debug_device(
+    body: DeviceRegisterRequest,
+    request: Request,
+) -> dict:
+    """Issue isolated, opaque test credentials; never touch MySQL."""
+    if ENV.RATE_LIMIT_ENABLED:
+        allowed, _ = rate_limiter.hit(
+            f"device-debug-register:{_client_ip(request)}", limit=10, window=60
+        )
+        if not allowed:
+            raise HTTPException(429, "Too many debug registrations")
+
+    uuid = body.device_uuid.strip()
+    if not uuid or len(uuid) > 128:
+        raise HTTPException(422, "Invalid device_uuid")
+
+    global _DEBUG_SEQUENCE
+    with _DEBUG_LOCK:
+        now = time.time()
+        _debug_cleanup(now)
+        item = _DEBUG_SESSIONS.get(uuid)
+        new = item is None
+        if new:
+            if len(_DEBUG_SESSIONS) >= _DEBUG_MAX_SESSIONS:
+                raise HTTPException(503, "Debug session capacity reached")
+            _DEBUG_SEQUENCE += 1
+            item = _DebugSession(
+                device_uuid=uuid,
+                user_id=-_DEBUG_SEQUENCE,
+                email=f"guest+{uuid}+debug@device.local",
+                expires_at=now + _DEBUG_LIFETIME,
+                access_hash="",
+                refresh_hash="",
+            )
+            _DEBUG_SESSIONS[uuid] = item
+        result = _debug_issue(item, now, rotate_refresh=True)
+        result["is_new_user"] = new
+        return result
+
+
+@router.post("/device/refresh/debug", response_model=None)
+def refresh_debug_device(body: RefreshRequest) -> dict:
+    """Rotate an in-memory debug refresh credential without extending its hour."""
+    raw = body.refresh_token
+    if not raw.startswith("dbg_r_"):
+        raise HTTPException(401, "Invalid debug refresh token")
+    digest = _debug_hash(raw)
+    with _DEBUG_LOCK:
+        now = time.time()
+        _debug_cleanup(now)
+        item = next(
+            (x for x in _DEBUG_SESSIONS.values()
+             if secrets.compare_digest(x.refresh_hash, digest)),
+            None,
+        )
+        if item is None:
+            raise HTTPException(401, "Debug session expired or token revoked")
+        return _debug_issue(item, now, rotate_refresh=True)
+
+
+@router.get("/device/me/debug", response_model=None)
+def me_debug_device(
+    credentials: HTTPAuthorizationCredentials | None = Depends(_bearer_optional),
+) -> dict:
+    """Example of how a debug-only endpoint validates an opaque access token."""
+    raw = credentials.credentials if credentials else ""
+    if not raw.startswith("dbg_a_"):
+        raise HTTPException(401, "Debug access token required")
+    digest = _debug_hash(raw)
+    with _DEBUG_LOCK:
+        now = time.time()
+        _debug_cleanup(now)
+        item = next(
+            (x for x in _DEBUG_SESSIONS.values()
+             if secrets.compare_digest(x.access_hash, digest)),
+            None,
+        )
+        if item is None:
+            raise HTTPException(401, "Invalid or expired debug session")
+        # Access token expiry must be tracked separately from the session expiry.
+        # See _DEBUG_ACCESS_EXPIRIES, populated when tokens are issued.
+        if _DEBUG_ACCESS_EXPIRIES.get(digest, 0) <= now:
+            raise HTTPException(401, "Debug access token expired")
+        return {
+            "user_id": item.user_id,
+            "email": item.email,
+            "debug": True,
+            "session_expires_in": max(0, int(item.expires_at - now)),
+        }
 
 
 @router.post(
