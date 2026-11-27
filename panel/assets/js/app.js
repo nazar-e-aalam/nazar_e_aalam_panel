@@ -14,7 +14,13 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const toast = api.toast;
 
-const ESC_MAP = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+const ESC_MAP = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;",
+};
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ESC_MAP[c]);
 const pad = (n) => String(n).padStart(2, "0");
 const cap = (s) => {
@@ -60,7 +66,10 @@ async function apiCall(promise, { success = null, errorPrefix = "" } = {}) {
     if (success) toast(success);
     return r;
   } catch (e) {
-    toast((errorPrefix ? errorPrefix + ": " : "") + (e.message || "Request failed"), true);
+    toast(
+      (errorPrefix ? errorPrefix + ": " : "") + (e.message || "Request failed"),
+      true,
+    );
     throw e;
   }
 }
@@ -74,7 +83,11 @@ async function readError(res) {
 }
 
 async function postForm(path, form) {
-  const res = await api.request(path, { method: "POST", body: form, headers: {} });
+  const res = await api.request(path, {
+    method: "POST",
+    body: form,
+    headers: {},
+  });
   if (!res.ok) throw new Error(await readError(res));
   return res.json();
 }
@@ -124,10 +137,13 @@ const ICONS = {
   key: '<circle cx="8" cy="12" r="4"/><path d="M12 12h8l2 2-2 2-2-2-2 2"/>',
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   head: '<path d="M4 15v-3a8 8 0 0116 0v3"/><path d="M3 14h4v6H3zM17 14h4v6h-4z"/>',
-  heart: '<path d="M12 21s-8-5-8-11a4.5 4.5 0 018-2.5A4.5 4.5 0 0120 10c0 6-8 11-8 11z"/>',
-  beads: '<circle cx="6" cy="9" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="18" cy="9" r="2"/><circle cx="18" cy="16" r="2"/><circle cx="12" cy="20" r="2"/><circle cx="6" cy="16" r="2"/>',
+  heart:
+    '<path d="M12 21s-8-5-8-11a4.5 4.5 0 018-2.5A4.5 4.5 0 0120 10c0 6-8 11-8 11z"/>',
+  beads:
+    '<circle cx="6" cy="9" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="18" cy="9" r="2"/><circle cx="18" cy="16" r="2"/><circle cx="12" cy="20" r="2"/><circle cx="6" cy="16" r="2"/>',
   img: '<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.5"/><path d="M21 16l-5-5-9 9"/>',
-  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+  globe:
+    '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
   set: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
   book: '<path d="M5 4h14v16H7a2 2 0 01-2-2z"/><path d="M9 8h6"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',
@@ -140,14 +156,19 @@ const ICONS = {
   upload: '<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>',
   down: '<path d="M12 4v12M7 11l5 5 5-5M4 20h16"/>',
   x: '<path d="M6 6l12 12M18 6L6 18"/>',
-  refresh: '<path d="M4 4v6h6M20 20v-6h-6"/><path d="M20 10a8 8 0 10-8 8 8 8 0 006-3"/>',
-  mobile: '<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/>',
-  roles: '<circle cx="9" cy="7" r="3"/><path d="M2 21v-2a5 5 0 0110 0v2"/><circle cx="17" cy="9" r="2.2"/><path d="M14 21v-1.5a4 4 0 017.5-1.5"/>',
+  refresh:
+    '<path d="M4 4v6h6M20 20v-6h-6"/><path d="M20 10a8 8 0 10-8 8 8 8 0 006-3"/>',
+  mobile:
+    '<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/>',
+  roles:
+    '<circle cx="9" cy="7" r="3"/><path d="M2 21v-2a5 5 0 0110 0v2"/><circle cx="17" cy="9" r="2.2"/><path d="M14 21v-1.5a4 4 0 017.5-1.5"/>',
 };
 
 const ic = (name) => {
   const path = ICONS[name];
-  return path ? `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${path}</svg>` : "";
+  return path
+    ? `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${path}</svg>`
+    : "";
 };
 
 // ============================================================================
@@ -165,7 +186,9 @@ function openModal(html, size = "") {
   m.setAttribute("aria-hidden", "false");
   document.body.classList.add("noscroll");
   setTimeout(() => {
-    m.querySelector("input:not([type=hidden]):not([type=file]):not([type=checkbox]),textarea,select,.btn")?.focus();
+    m.querySelector(
+      "input:not([type=hidden]):not([type=file]):not([type=checkbox]),textarea,select,.btn",
+    )?.focus();
   }, 30);
 }
 
@@ -176,7 +199,8 @@ function closeModal() {
   m.setAttribute("aria-hidden", "true");
   document.body.classList.remove("noscroll");
   modalCtx = null;
-  if (lastFocus && lastFocus.focus && document.contains(lastFocus)) lastFocus.focus();
+  if (lastFocus && lastFocus.focus && document.contains(lastFocus))
+    lastFocus.focus();
 }
 
 const modalHeader = (title) =>
@@ -221,7 +245,15 @@ function fieldHtml(f, v) {
     </div>`;
 }
 
-function formModal({ title, fields, data = {}, okLabel = "Save", size = "", onOpen, onSubmit }) {
+function formModal({
+  title,
+  fields,
+  data = {},
+  okLabel = "Save",
+  size = "",
+  onOpen,
+  onSubmit,
+}) {
   openModal(
     `<form id="mform" novalidate>
        ${modalHeader(title)}
@@ -270,8 +302,10 @@ function formModal({ title, fields, data = {}, okLabel = "Save", size = "", onOp
         else {
           const n = Number(v);
           if (!Number.isInteger(n)) fail(`${f.l} must be a whole number.`);
-          else if (f.min != null && n < f.min) fail(`${f.l} must be ≥ ${f.min}.`);
-          else if (f.max != null && n > f.max) fail(`${f.l} must be ≤ ${f.max}.`);
+          else if (f.min != null && n < f.min)
+            fail(`${f.l} must be ≥ ${f.min}.`);
+          else if (f.max != null && n > f.max)
+            fail(`${f.l} must be ≤ ${f.max}.`);
           else v = n;
         }
       }
@@ -350,7 +384,10 @@ function loadPermissions(me) {
   const codes = ((me && me.roles) || []).flatMap((r) => r.permissions || []);
   state.permissions = codes.length ? new Set(codes) : null;
 }
-const can = (perm) => !state.permissions || state.permissions.has("*") || state.permissions.has(perm);
+const can = (perm) =>
+  !state.permissions ||
+  state.permissions.has("*") ||
+  state.permissions.has(perm);
 
 // ---- Cached loaders -----------------------------------------------------------
 async function ensureRoles(force = false) {
@@ -358,7 +395,13 @@ async function ensureRoles(force = false) {
     state.roles = null;
     api.cache.invalidate("roles");
   }
-  if (!state.roles) state.roles = await loadCached("roles", 5 * 60_000, () => api.get("/roles"), []);
+  if (!state.roles)
+    state.roles = await loadCached(
+      "roles",
+      5 * 60_000,
+      () => api.get("/roles"),
+      [],
+    );
   return state.roles;
 }
 
@@ -375,7 +418,12 @@ async function ensureSettings() {
 
 async function ensureCities() {
   if (state.cities) return state.cities;
-  state.cities = await loadCached("cities", 60 * 60_000, () => api.get("/prayer-times/cities"), []);
+  state.cities = await loadCached(
+    "cities",
+    60 * 60_000,
+    () => api.get("/prayer-times/cities"),
+    [],
+  );
   return state.cities;
 }
 
@@ -394,7 +442,10 @@ async function refreshMe() {
 function renderNav() {
   $("#nav").innerHTML = NAV.filter(([, , perm]) => !perm || can(perm))
     .map(
-      ([n, i]) => `<a href="#${encodeURIComponent(n)}" class="${n === state.page ? "act" : ""}"
+      ([
+        n,
+        i,
+      ]) => `<a href="#${encodeURIComponent(n)}" class="${n === state.page ? "act" : ""}"
           ${n === state.page ? 'aria-current="page"' : ""} data-act="go" data-p="${esc(n)}">${ic(i)}${esc(n)}</a>`,
     )
     .join("");
@@ -429,7 +480,8 @@ function applyBrand() {
 }
 
 const isMobile = () => matchMedia("(max-width: 900px)").matches;
-const menuIsOpen = () => document.body.classList.contains(isMobile() ? "open" : "rail");
+const menuIsOpen = () =>
+  document.body.classList.contains(isMobile() ? "open" : "rail");
 
 function setMenu(on) {
   const mobile = isMobile();
@@ -438,7 +490,8 @@ function setMenu(on) {
   $('[data-act="menu"].chip')?.setAttribute("aria-expanded", String(on));
 }
 
-const loadingCard = () => `<div class="card glass s12"><div class="empty">${ic("refresh")} Loading…</div></div>`;
+const loadingCard = () =>
+  `<div class="card glass s12"><div class="empty">${ic("refresh")} Loading…</div></div>`;
 
 async function go(page) {
   if (!isPage(page)) page = "Dashboard";
@@ -516,9 +569,9 @@ function startDashboard() {
 const DEMO_PLATFORM = { android: 180, ios: 60 };
 
 async function platformCard() {
-  const data = await api.get('/administrators/devices/stats');
-  const android = data.android
-  const ios = data.ios
+  const data = await api.get("/administrators/devices/stats");
+  const android = data.android;
+  const ios = data.ios;
   const total = android + ios;
   const aPct = Math.round((android / total) * 100);
   const iPct = 100 - aPct;
@@ -593,7 +646,8 @@ function nextPrayerNow(times) {
   }
 
   const span = next.min - prev.min;
-  const progress = span > 0 ? Math.min(1, Math.max(0, (nowMin - prev.min) / span)) : 0;
+  const progress =
+    span > 0 ? Math.min(1, Math.max(0, (nowMin - prev.min) / span)) : 0;
   return {
     name: next.label,
     secondsLeft: Math.max(0, Math.round((next.min - nowMin) * 60)),
@@ -617,7 +671,9 @@ function dashboardTick() {
   if (rg) rg.style.strokeDashoffset = String(100 * (1 - np.progress));
   const name = $("#np-name");
   if (name) name.textContent = np.name;
-  $$("#np-list div").forEach((el) => el.classList.toggle("nx", el.dataset.prayer === np.name.toLowerCase()));
+  $$("#np-list div").forEach((el) =>
+    el.classList.toggle("nx", el.dataset.prayer === np.name.toLowerCase()),
+  );
 }
 
 function matchCity(cityName) {
@@ -627,7 +683,12 @@ function matchCity(cityName) {
     state.cities.find((c) => {
       const key = c.key.toLowerCase();
       const name = c.name.toLowerCase();
-      return key === needle || name === needle || name.startsWith(needle) || needle.startsWith(name);
+      return (
+        key === needle ||
+        name === needle ||
+        name.startsWith(needle) ||
+        needle.startsWith(name)
+      );
     }) || null
   );
 }
@@ -636,7 +697,9 @@ async function loadTodayPrayerTimes(city) {
   if (!city) return null;
   const today = localISODate();
   try {
-    const r = await api.get(`/prayer-times?city=${encodeURIComponent(city)}&from=${today}&to=${today}&limit=5`);
+    const r = await api.get(
+      `/prayer-times?city=${encodeURIComponent(city)}&from=${today}&to=${today}&limit=5`,
+    );
     const row = (r.items || [])[0];
     if (!row) return null;
     return {
@@ -659,7 +722,9 @@ async function loadTodayPrayerTimes(city) {
 
 async function loadLocationPrayerTimes(d) {
   try {
-    const r = await api.get(`/prayer-times/for-location?lat=${d.lat}&lon=${d.lon}`);
+    const r = await api.get(
+      `/prayer-times/for-location?lat=${d.lat}&lon=${d.lon}`,
+    );
     const t = r.timings || {};
     return {
       city: r.city_name || d.city || "detected",
@@ -697,10 +762,13 @@ function renderNextPrayer(todayTimes, cities, detectedLabel = null) {
   }
 
   const options = cities.map(
-    (c) => `<option value="${esc(c.key)}"${c.key === state.prayerCity && !detectedLabel ? " selected" : ""}>${esc(c.name)}</option>`,
+    (c) =>
+      `<option value="${esc(c.key)}"${c.key === state.prayerCity && !detectedLabel ? " selected" : ""}>${esc(c.name)}</option>`,
   );
   if (detectedLabel) {
-    options.unshift(`<option value="__detected__" selected>${esc(detectedLabel)} (detected)</option>`);
+    options.unshift(
+      `<option value="__detected__" selected>${esc(detectedLabel)} (detected)</option>`,
+    );
   }
 
   const t = todayTimes.times;
@@ -739,7 +807,8 @@ function renderNextPrayer(todayTimes, cities, detectedLabel = null) {
 
 async function dashboardPage() {
   const u = state.me || state.user;
-  const name = (u && (u.first_name || (u.email || "").split("@")[0])) || "admin";
+  const name =
+    (u && (u.first_name || (u.email || "").split("@")[0])) || "admin";
   const greet = "السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ ٱللَّهِ وَبَرَكاتُهُ";
   const today = new Date().toLocaleDateString("en-IN", {
     weekday: "long",
@@ -749,18 +818,25 @@ async function dashboardPage() {
   });
 
   const quick = [
-    can("duas:write") && `<button type="button" data-act="go" data-p="Duas" data-then="add">${ic("plus")}Add dua</button>`,
-    can("dhikrs:write") && `<button type="button" data-act="go" data-p="Dhikrs" data-then="add">${ic("beads")}Add dhikr</button>`,
-    can("wallpapers:write") && `<button type="button" class="g" data-act="go" data-p="Wallpapers" data-then="add">${ic("img")}Add wallpaper</button>`,
+    can("duas:write") &&
+      `<button type="button" data-act="go" data-p="Duas" data-then="add">${ic("plus")}Add dua</button>`,
+    can("dhikrs:write") &&
+      `<button type="button" data-act="go" data-p="Dhikrs" data-then="add">${ic("beads")}Add dhikr</button>`,
+    can("wallpapers:write") &&
+      `<button type="button" class="g" data-act="go" data-p="Wallpapers" data-then="add">${ic("img")}Add wallpaper</button>`,
   ].filter(Boolean);
 
   const cities = await ensureCities();
 
   // Resolve which city to use: explicit choice → detected location matched to a curated city
-  let resolvedCity = state.prayerCity === "__detected__" ? null : state.prayerCity;
-  if (!resolvedCity && state.detected?.city) resolvedCity = matchCity(state.detected.city)?.key || null;
+  let resolvedCity =
+    state.prayerCity === "__detected__" ? null : state.prayerCity;
+  if (!resolvedCity && state.detected?.city)
+    resolvedCity = matchCity(state.detected.city)?.key || null;
 
-  const hasCoords = typeof state.detected?.lat === "number" && typeof state.detected?.lon === "number";
+  const hasCoords =
+    typeof state.detected?.lat === "number" &&
+    typeof state.detected?.lon === "number";
   const kind = resolvedCity ? "curated" : hasCoords ? "detected" : "unresolved";
 
   let todayTimes = null;
@@ -772,8 +848,11 @@ async function dashboardPage() {
   }
   state.prayerTimes = todayTimes ? todayTimes.times : null;
 
-  const hijriCity = resolvedCity || state.detected?.city?.toLowerCase().trim() || "nadiad";
-  const hijri = await api.get("/hijri/now?city=" + encodeURIComponent(hijriCity)).catch(() => null);
+  const hijriCity =
+    resolvedCity || state.detected?.city?.toLowerCase().trim() || "nadiad";
+  const hijri = await api
+    .get("/hijri/now?city=" + encodeURIComponent(hijriCity))
+    .catch(() => null);
   let hijriLine = "";
   if (hijri) {
     hijriLine = `${hijri.hijri_day} ${hijri.hijri_month_name} ${hijri.hijri_year} AH`;
@@ -782,21 +861,77 @@ async function dashboardPage() {
 
   // Stat counters fill in asynchronously; init() waits on state.dashboardReady
   const stats = [
-    { key: "wallpapers", icon: "img", label: "Wallpapers", endpoint: "/wallpapers?limit=1" },
+    {
+      key: "wallpapers",
+      icon: "img",
+      label: "Wallpapers",
+      endpoint: "/wallpapers?limit=1",
+    },
     { key: "duas", icon: "heart", label: "Duas", endpoint: "/duas?limit=1" },
-    { key: "dhikrs", icon: "beads", label: "Dhikrs", endpoint: "/dhikrs?limit=1" },
-    { key: "dhikr campaigns", icon: "book", label: "Dhikr Campaigns", endpoint: "/admin/dhikr/campaigns?limit=1" },
-    { key: "admins", icon: "shield", label: "Administrators", endpoint: "/administrators?limit=1" },
+    {
+      key: "dhikrs",
+      icon: "beads",
+      label: "Dhikrs",
+      endpoint: "/dhikrs?limit=1",
+    },
+    {
+      key: "dhikr campaigns",
+      icon: "book",
+      label: "Dhikr Campaigns",
+      endpoint: "/admin/dhikr/campaigns?limit=1",
+    },
+    {
+      key: "admins",
+      icon: "shield",
+      label: "Administrators",
+      endpoint: "/administrators?limit=1",
+    },
   ];
-  state.dashboardReady = Promise.allSettled(stats.map((s) => api.get(s.endpoint))).then((results) => {
-    if (state.page !== "Dashboard") return;
-    results.forEach((r, i) => {
-      const el = $(`[data-count="${stats[i].key}"]`);
-      if (el) el.textContent = r.status === "fulfilled" && r.value?.meta ? r.value.meta.total : results.length;
+  const dashboardToken = state.navToken;
+
+  state.dashboardReady = Promise.allSettled(
+    stats.map((s) => api.get(s.endpoint))
+  ).then((results) => {
+    return new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        if (
+          state.page !== "Dashboard" ||
+          state.navToken !== dashboardToken
+        ) {
+          resolve();
+          return;
+        }
+
+        results.forEach((r, i) => {
+          const el = $(`[data-count="${stats[i].key}"]`);
+          if (!el) return;
+
+          if (r.status === "fulfilled") {
+            const total =
+              r.value?.meta?.total ??
+              r.value?.total ??
+              (Array.isArray(r.value) ? r.value.length : null);
+
+            el.textContent = total ?? "—";
+          } else {
+            el.textContent = "—";
+            console.error(
+              "Dashboard counter failed:",
+              stats[i].endpoint,
+              r.reason
+            );
+          }
+        });
+
+        resolve();
+      });
     });
   });
 
-  const detectedLabel = kind === "detected" ? [state.detected.city, state.detected.country].filter(Boolean).join(", ") : null;
+  const detectedLabel =
+    kind === "detected"
+      ? [state.detected.city, state.detected.country].filter(Boolean).join(", ")
+      : null;
 
   let npCard;
   if (kind === "unresolved") {
@@ -820,7 +955,9 @@ async function dashboardPage() {
 
   if (kind === "detected" && todayTimes && !state.detectedToastShown) {
     state.detectedToastShown = true;
-    const label = detectedLabel || `${state.detected.lat.toFixed(3)}, ${state.detected.lon.toFixed(3)}`;
+    const label =
+      detectedLabel ||
+      `${state.detected.lat.toFixed(3)}, ${state.detected.lon.toFixed(3)}`;
     setTimeout(() => toast(`📍 Using computed prayer times for ${label}`), 400);
   }
 
@@ -860,7 +997,10 @@ function savePrayerCityPref(key) {
 
 function persistDetected(detected) {
   if (!detected) return store.del(LOCATION_CACHE_KEY);
-  store.set(LOCATION_CACHE_KEY, JSON.stringify({ ...detected, _cachedAt: Date.now() }));
+  store.set(
+    LOCATION_CACHE_KEY,
+    JSON.stringify({ ...detected, _cachedAt: Date.now() }),
+  );
 }
 
 function loadPersistedDetected() {
@@ -880,7 +1020,8 @@ function loadPersistedDetected() {
 
 function browserGeolocation() {
   return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) return reject(new Error("Browser geolocation is not supported"));
+    if (!navigator.geolocation)
+      return reject(new Error("Browser geolocation is not supported"));
     navigator.geolocation.getCurrentPosition(
       (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
       (err) =>
@@ -901,7 +1042,9 @@ function browserGeolocation() {
 async function detectLocationFromBrowser() {
   try {
     const coords = await browserGeolocation();
-    const d = await api.get(`/location/get?lat=${coords.lat}&lon=${coords.lon}`);
+    const d = await api.get(
+      `/location/get?lat=${coords.lat}&lon=${coords.lon}`,
+    );
     await ensureCities();
 
     state.detected = {
@@ -922,7 +1065,10 @@ async function detectLocationFromBrowser() {
     state.prayerCity = match ? match.key : null;
     state.prayerCityPage = match ? match.key : null;
     if (match) toast(`Location detected: ${d.city}, ${d.country}`);
-    else toast(`Detected ${d.city || "your area"} — using computed prayer times for these coordinates.`);
+    else
+      toast(
+        `Detected ${d.city || "your area"} — using computed prayer times for these coordinates.`,
+      );
 
     return { coords, data: d, match };
   } catch (e) {
@@ -937,7 +1083,8 @@ async function autoPromptLocationIfNeeded() {
 
   let permission = null;
   try {
-    permission = (await navigator.permissions.query({ name: "geolocation" })).state;
+    permission = (await navigator.permissions.query({ name: "geolocation" }))
+      .state;
   } catch {}
   if (permission === "denied") return;
 
@@ -965,20 +1112,78 @@ const langFields = () => [
   ...LANGS.flatMap(([c, name, rtl]) => [
     { sec: name },
     { k: `${c}_short_name`, l: "Short name", ar: rtl, full: 1 },
-    { k: `${c}_full_name`, l: "Full text", t: "area", rows: c === "ar" ? 4 : 3, ar: rtl, full: 1 },
-    { k: `${c}_fazilat`, l: "Fazilat / Benefit", t: "area", rows: 2, ar: rtl, full: 1 },
+    {
+      k: `${c}_full_name`,
+      l: "Full text",
+      t: "area",
+      rows: c === "ar" ? 4 : 3,
+      ar: rtl,
+      full: 1,
+    },
+    {
+      k: `${c}_fazilat`,
+      l: "Fazilat / Benefit",
+      t: "area",
+      rows: 2,
+      ar: rtl,
+      full: 1,
+    },
   ]),
 ];
 
 const langColumns = () => [
   { label: "Position", get: (x) => x.position },
-  ...LANGS.map(([c, name, rtl]) => ({
-    label: `Short (${name.slice(0, 3)})`,
-    get: (x) => x[`${c}_short_name`],
-    rtl: !!rtl,
-  })),
-  { label: "Fazilat / Benefit", get: (x) => x.en_fazilat, wrap: true },
+  {
+    label: "Title",
+    html: true,
+    wrap: true,
+    get: (x) =>
+      `<strong>${esc(x.en_short_name || "Untitled")}</strong><div class="content-secondary" dir="rtl">${esc(x.ar_short_name || "")}</div><small class="content-secondary">${esc(x.guj_short_name || "")}</small>`,
+  },
+  {
+    label: "Languages",
+    get: (x) =>
+      `${LANGS.filter(([c]) => x[c + "_short_name"]?.trim() && x[c + "_full_name"]?.trim()).length}/6`,
+  },
+  { label: "Fazilat", get: (x) => (x.en_fazilat ? "Available" : "—") },
 ];
+function tabLanguageEditor(form) {
+  const fields = $(".mf", form);
+  const tabs = document.createElement("div");
+  tabs.className = "content-tabs full";
+  tabs.innerHTML = LANGS.map(
+    ([k, l]) =>
+      `<button type="button" data-lang="${k}" class="b3">${l}</button>`,
+  ).join("");
+  const first = fields.querySelector('[name="en_short_name"]')?.closest("div");
+  if (!first) return;
+  const heading = first.previousElementSibling;
+  heading.before(tabs);
+  const show = (k) => {
+    for (const [c] of LANGS) {
+      const start = fields
+        .querySelector(`[name="${c}_short_name"]`)
+        ?.closest("div");
+      if (start?.previousElementSibling?.classList.contains("sec"))
+        start.previousElementSibling.hidden = c !== k;
+      for (const part of LANG_PARTS) {
+        const el = fields.querySelector(`[name="${c}_${part}"]`);
+        if (el) el.closest("div").hidden = c !== k;
+      }
+    }
+    const tr = fields.querySelector(".tr-btn");
+    if (tr) tr.parentElement.hidden = k !== "en";
+    for (const b of tabs.children) {
+      b.className = b.dataset.lang === k ? "b2" : "b3";
+      b.setAttribute("aria-pressed", String(b.dataset.lang === k));
+    }
+  };
+  tabs.onclick = (e) => {
+    const b = e.target.closest("[data-lang]");
+    if (b) show(b.dataset.lang);
+  };
+  show("en");
+}
 
 // Adds an "Auto-translate English → all languages" button under the English fields.
 function autoTranslateHook(endpoint) {
@@ -995,7 +1200,8 @@ function autoTranslateHook(endpoint) {
 
     btn.onclick = async () => {
       const [short, full, fazilat] = en.map((el) => el.value.trim());
-      if (!short && !full && !fazilat) return toast("Enter English text first", true);
+      if (!short && !full && !fazilat)
+        return toast("Enter English text first", true);
       btn.disabled = true;
       btn.textContent = "Translating…";
       try {
@@ -1032,15 +1238,30 @@ const contentCrud = (endpoint, singular, title, sub, icon) => ({
   label: (x) => x.en_short_name || `#${x.id}`,
   columns: langColumns(),
   fields: langFields(),
-  onOpen: autoTranslateHook(`${endpoint}/auto-translate`),
+  onOpen: (form) => {
+    autoTranslateHook(`${endpoint}/auto-translate`)(form);
+    tabLanguageEditor(form);
+  },
 });
 
 const roleChip = (r, checked) =>
   `<label class="role-chip"><input type="checkbox" name="__role_${r.id}" value="${r.id}"${checked ? " checked" : ""}><span>${esc(r.name)}</span></label>`;
 
 const CRUD = {
-  Duas: contentCrud("/duas", "Dua", "Dua List", "Supplications shown in the app · 6 languages + fazilat", "heart"),
-  Dhikrs: contentCrud("/dhikrs", "Dhikr", "Dhikr List", "Remembrances for the tasbih counter · 6 languages + fazilat", "beads"),
+  Duas: contentCrud(
+    "/duas",
+    "Dua",
+    "Dua List",
+    "Supplications shown in the app · 6 languages + fazilat",
+    "heart",
+  ),
+  Dhikrs: contentCrud(
+    "/dhikrs",
+    "Dhikr",
+    "Dhikr List",
+    "Remembrances for the tasbih counter · 6 languages + fazilat",
+    "beads",
+  ),
   Administrators: {
     endpoint: "/administrators",
     singular: "Administrator",
@@ -1048,12 +1269,21 @@ const CRUD = {
     sub: "People who can sign in — new admins come in via Invitations",
     icon: "shield",
     perm: "administrators",
-    label: (x) => `${x.first_name || ""} ${x.last_name || ""}`.trim() || x.email,
-    primaryAction: { label: "Invite admin", icon: "key", act: "invite-open", perm: "invitations:write" },
+    label: (x) =>
+      `${x.first_name || ""} ${x.last_name || ""}`.trim() || x.email,
+    primaryAction: {
+      label: "Invite admin",
+      icon: "key",
+      act: "invite-open",
+      perm: "invitations:write",
+    },
     hideDelete: true,
     reinvite: true,
     columns: [
-      { label: "Name", get: (x) => `${x.first_name || ""} ${x.last_name || ""}`.trim() || "—" },
+      {
+        label: "Name",
+        get: (x) => `${x.first_name || ""} ${x.last_name || ""}`.trim() || "—",
+      },
       { label: "Email", get: (x) => x.email },
       {
         label: "Roles",
@@ -1062,9 +1292,15 @@ const CRUD = {
           const roles = x.roles || [];
           const pills = roles.length
             ? roles.map((r) => `<span class="pill">${esc(r.name)}</span>`)
-            : [x.is_admin ? `<span class="pill">Admin</span>` : `<span class="pill off">User</span>`];
+            : [
+                x.is_admin
+                  ? `<span class="pill">Admin</span>`
+                  : `<span class="pill off">User</span>`,
+              ];
           if (x.has_pending_invite) {
-            pills.push(`<span class="pill warn" title="Re-invite pending — waiting for acceptance">pending</span>`);
+            pills.push(
+              `<span class="pill warn" title="Re-invite pending — waiting for acceptance">pending</span>`,
+            );
           }
           return pills.join(" ");
         },
@@ -1089,7 +1325,9 @@ const CRUD = {
       form.querySelector(".mf").appendChild(block);
     },
     collect: (form) => ({
-      role_ids: $$('input[name^="__role_"]:checked', form).map((cb) => parseInt(cb.value, 10)),
+      role_ids: $$('input[name^="__role_"]:checked', form).map((cb) =>
+        parseInt(cb.value, 10),
+      ),
     }),
   },
 };
@@ -1103,8 +1341,11 @@ function renderCell(c, x) {
 
 async function crudPage(key) {
   const cfg = CRUD[key];
-  if (!cfg) return `<div class="card glass s12"><div class="empty">Unknown page: ${esc(key)}</div></div>`;
-  const list = await apiCall(api.get(cfg.endpoint + "?limit=500"), { errorPrefix: `Load ${key}` });
+  if (!cfg)
+    return `<div class="card glass s12"><div class="empty">Unknown page: ${esc(key)}</div></div>`;
+  const list = await apiCall(api.get(cfg.endpoint + "?limit=500"), {
+    errorPrefix: `Load ${key}`,
+  });
   const items = list.items || [];
 
   let headAction = "";
@@ -1133,7 +1374,9 @@ async function crudPage(key) {
   const actionsFor = (x) => {
     const out = [];
     if (canWrite) {
-      out.push(`<button type="button" title="Edit" data-act="crud-edit" data-key="${esc(key)}" data-id="${x.id}">${ic("edit")}</button>`);
+      out.push(
+        `<button type="button" title="Edit" data-act="crud-edit" data-key="${esc(key)}" data-id="${x.id}">${ic("edit")}</button>`,
+      );
     }
     if (cfg.reinvite && can("invitations:write")) {
       const pending = x.has_pending_invite === true;
@@ -1152,10 +1395,14 @@ async function crudPage(key) {
     return out.join("") || "—";
   };
 
-  const header = cfg.columns.map((c) => `<th>${esc(c.label)}</th>`).join("") + "<th>Action</th>";
+  const header =
+    cfg.columns.map((c) => `<th>${esc(c.label)}</th>`).join("") +
+    "<th>Action</th>";
   const rows = items
     .map(
-      (x) => `<tr data-id="${x.id}">${cfg.columns.map((c) => renderCell(c, x)).join("")}
+      (
+        x,
+      ) => `<tr data-id="${x.id}">${cfg.columns.map((c) => renderCell(c, x)).join("")}
         <td><span class="act-b">${actionsFor(x)}</span></td></tr>`,
     )
     .join("");
@@ -1170,7 +1417,8 @@ async function crudPage(key) {
 async function openCrudForm(key, id) {
   const cfg = CRUD[key];
   if (!cfg) return;
-  if (!can(`${cfg.perm}:write`)) return toast("You don't have permission to edit this resource", true);
+  if (!can(`${cfg.perm}:write`))
+    return toast("You don't have permission to edit this resource", true);
 
   let existing = null;
   if (id != null) {
@@ -1266,7 +1514,9 @@ async function invitationsPage() {
     .map((inv) => {
       const actions = [];
       if (canWrite && (inv.status === "pending" || inv.status === "expired")) {
-        actions.push(`<button type="button" title="Resend" data-act="invite-resend" data-id="${inv.id}">${ic("refresh")}</button>`);
+        actions.push(
+          `<button type="button" title="Resend" data-act="invite-resend" data-id="${inv.id}">${ic("refresh")}</button>`,
+        );
       }
       if (canWrite && inv.status === "pending") {
         actions.push(
@@ -1294,20 +1544,40 @@ async function invitationsPage() {
 }
 
 async function openInviteForm() {
-  if (!can("invitations:write")) return toast("You don't have permission to invite admins", true);
+  if (!can("invitations:write"))
+    return toast("You don't have permission to invite admins", true);
 
   const roles = await ensureRoles();
   formModal({
     title: "Invite a new administrator",
     okLabel: "Send invite",
     fields: [
-      { k: "email", l: "Email", t: "email", req: 1, full: 1, h: "They'll receive an invite email with a link to set their password." },
-      { k: "role_id", l: "Role", t: "select", o: ["", ...roles.map((r) => r.name)], full: 1, h: "Optional. The role the new admin will get." },
+      {
+        k: "email",
+        l: "Email",
+        t: "email",
+        req: 1,
+        full: 1,
+        h: "They'll receive an invite email with a link to set their password.",
+      },
+      {
+        k: "role_id",
+        l: "Role",
+        t: "select",
+        o: ["", ...roles.map((r) => r.name)],
+        full: 1,
+        h: "Optional. The role the new admin will get.",
+      },
     ],
     onSubmit: async (vals) => {
-      const role = vals.role_id ? roles.find((r) => r.name === vals.role_id) : null;
+      const role = vals.role_id
+        ? roles.find((r) => r.name === vals.role_id)
+        : null;
       try {
-        await api.post("/admin/invitations", { email: vals.email, role_id: role ? role.id : null });
+        await api.post("/admin/invitations", {
+          email: vals.email,
+          role_id: role ? role.id : null,
+        });
         toast("Invitation sent");
         await go("Invitations");
         return null;
@@ -1321,7 +1591,8 @@ async function openInviteForm() {
 // ============================================================================
 // Roles
 // ============================================================================
-const titleCase = (s) => s.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+const titleCase = (s) =>
+  s.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 function permGridHtml(catalog, selectedCodes) {
   const selected = new Set(selectedCodes || []);
@@ -1353,7 +1624,8 @@ function wirePermGrid(form) {
   const toggles = () => $$("input[data-group-toggle]", form);
   const updateCount = () => {
     const el = $("#perm-count", form);
-    if (el) el.textContent = `${perms().filter((c) => c.checked).length} selected`;
+    if (el)
+      el.textContent = `${perms().filter((c) => c.checked).length} selected`;
   };
   const setAll = (on) => {
     perms().forEach((c) => (c.checked = on));
@@ -1369,18 +1641,21 @@ function wirePermGrid(form) {
         .forEach((c) => (c.checked = t.checked));
     } else if (t.name === "__perm") {
       const group = perms().filter((c) => c.dataset.group === t.dataset.group);
-      const toggle = toggles().find((c) => c.dataset.groupToggle === t.dataset.group);
+      const toggle = toggles().find(
+        (c) => c.dataset.groupToggle === t.dataset.group,
+      );
       if (toggle) toggle.checked = group.every((c) => c.checked);
     } else return;
     updateCount();
   });
-  $('[data-perm-all]', form).onclick = () => setAll(true);
-  $('[data-perm-none]', form).onclick = () => setAll(false);
+  $("[data-perm-all]", form).onclick = () => setAll(true);
+  $("[data-perm-none]", form).onclick = () => setAll(false);
   updateCount();
 }
 
 async function openRoleForm(existing) {
-  if (!can("roles:write")) return toast("You don't have permission to manage roles", true);
+  if (!can("roles:write"))
+    return toast("You don't have permission to manage roles", true);
 
   let catalog;
   try {
@@ -1396,8 +1671,19 @@ async function openRoleForm(existing) {
     size: "lg",
     data: existing || {},
     fields: [
-      { k: "name", l: "Role name", req: 1, full: 1, h: "e.g. Content Manager, Moderator" },
-      { k: "description", l: "Description", full: 1, h: "Optional. Short summary shown on the Roles page." },
+      {
+        k: "name",
+        l: "Role name",
+        req: 1,
+        full: 1,
+        h: "e.g. Content Manager, Moderator",
+      },
+      {
+        k: "description",
+        l: "Description",
+        full: 1,
+        h: "Optional. Short summary shown on the Roles page.",
+      },
     ],
     onOpen: (form) => {
       const block = document.createElement("div");
@@ -1412,13 +1698,26 @@ async function openRoleForm(existing) {
       wirePermGrid(form);
     },
     onSubmit: async (vals) => {
-      const permissions = $$('#mform input[name="__perm"]:checked').map((cb) => cb.value);
+      const permissions = $$('#mform input[name="__perm"]:checked').map(
+        (cb) => cb.value,
+      );
       if (!permissions.length) return "Pick at least one permission.";
-      const body = { name: vals.name, description: vals.description || null, permissions };
+      const body = {
+        name: vals.name,
+        description: vals.description || null,
+        permissions,
+      };
       try {
         if (isEdit) await api.patch(`/roles/${existing.id}`, body);
-        else await api.post("/roles", { ...body, is_admin: true, is_default: false });
-        toast(`Role "${vals.name}" ${isEdit ? "updated" : "created"} (${permissions.length} permissions)`);
+        else
+          await api.post("/roles", {
+            ...body,
+            is_admin: true,
+            is_default: false,
+          });
+        toast(
+          `Role "${vals.name}" ${isEdit ? "updated" : "created"} (${permissions.length} permissions)`,
+        );
         await ensureRoles(true);
         await go("Roles");
         return null;
@@ -1430,7 +1729,8 @@ async function openRoleForm(existing) {
 }
 
 function confirmDeleteRole(id, name, userCount) {
-  if (!can("roles:write")) return toast("You don't have permission to delete roles", true);
+  if (!can("roles:write"))
+    return toast("You don't have permission to delete roles", true);
   confirmBox({
     title: `Delete role "${name}"?`,
     msg:
@@ -1454,7 +1754,10 @@ async function rolesPage() {
   let roles = [];
   let catalog = { groups: {}, all: [] };
   try {
-    [roles, catalog] = await Promise.all([api.get("/roles"), api.get("/roles/permissions/catalog")]);
+    [roles, catalog] = await Promise.all([
+      api.get("/roles"),
+      api.get("/roles/permissions/catalog"),
+    ]);
   } catch (e) {
     return `<div class="card glass s12"><div class="empty">${ic("x")} ${esc(e.message || "Failed to load roles")}</div></div>`;
   }
@@ -1468,7 +1771,9 @@ async function rolesPage() {
 
   if (!roles.length) {
     return `<div class="card glass s12">${head}<div class="empty">No roles yet. ${
-      canWrite ? "Click <b>New role</b> to create the first one." : "Ask a Super Admin to create one."
+      canWrite
+        ? "Click <b>New role</b> to create the first one."
+        : "Ask a Super Admin to create one."
     }</div></div>`;
   }
 
@@ -1480,7 +1785,8 @@ async function rolesPage() {
           ? `<span class="pill">admin</span>`
           : `<span class="pill off">user</span>`;
       const actions = [
-        canWrite && `<button type="button" title="Edit permissions" data-act="role-edit-perms" data-id="${r.id}">${ic("edit")}</button>`,
+        canWrite &&
+          `<button type="button" title="Edit permissions" data-act="role-edit-perms" data-id="${r.id}">${ic("edit")}</button>`,
         canWrite &&
           !r.is_default &&
           `<button type="button" class="d" title="Delete" data-act="role-delete" data-id="${r.id}" data-name="${esc(r.name)}" data-users="${r.user_count || 0}">${ic("trash")}</button>`,
@@ -1509,7 +1815,9 @@ async function rolesPage() {
 // Wallpapers
 // ============================================================================
 async function wallpapersPage() {
-  const r = await apiCall(api.get("/wallpapers?limit=500"), { errorPrefix: "Load wallpapers" });
+  const r = await apiCall(api.get("/wallpapers?limit=500"), {
+    errorPrefix: "Load wallpapers",
+  });
   const items = r.items || [];
   const canWrite = can("wallpapers:write");
 
@@ -1525,7 +1833,9 @@ async function wallpapersPage() {
 
   const tiles = items
     .map(
-      (w) => `<div class="wp" data-act="wall-preview" data-id="${w.id}" role="button" tabindex="0" title="Preview ${esc(w.name)}">
+      (
+        w,
+      ) => `<div class="wp" data-act="wall-preview" data-id="${w.id}" role="button" tabindex="0" title="Preview ${esc(w.name)}">
         ${w.image ? `<img src="${esc(w.image)}" alt="${esc(w.name)}" loading="lazy">` : ""}
         ${
           canWrite
@@ -1563,7 +1873,8 @@ const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 
 function openWallForm(existing) {
-  if (!can("wallpapers:write")) return toast("You don't have permission to edit wallpapers", true);
+  if (!can("wallpapers:write"))
+    return toast("You don't have permission to edit wallpapers", true);
 
   const isEdit = !!existing;
   openModal(`
@@ -1629,12 +1940,15 @@ function openWallForm(existing) {
   function showPreview(f) {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     preview.style.display = "none";
-    if (!IMAGE_TYPES.includes(f.type)) return void (errEl.textContent = "Only JPEG, PNG, or WebP allowed");
-    if (f.size > MAX_IMAGE_BYTES) return void (errEl.textContent = "Max file size is 10 MB");
+    if (!IMAGE_TYPES.includes(f.type))
+      return void (errEl.textContent = "Only JPEG, PNG, or WebP allowed");
+    if (f.size > MAX_IMAGE_BYTES)
+      return void (errEl.textContent = "Max file size is 10 MB");
     errEl.textContent = "";
     previewUrl = URL.createObjectURL(f);
     $("#wf_preview_img").src = previewUrl;
-    $("#wf_preview_meta").textContent = `${f.name} · ${(f.size / 1024).toFixed(0)} KB`;
+    $("#wf_preview_meta").textContent =
+      `${f.name} · ${(f.size / 1024).toFixed(0)} KB`;
     preview.style.display = "block";
   }
 
@@ -1660,7 +1974,10 @@ function openWallForm(existing) {
     fileInput.files = dt.files;
     showPreview(f);
   });
-  fileInput.addEventListener("change", () => fileInput.files?.[0] && showPreview(fileInput.files[0]));
+  fileInput.addEventListener(
+    "change",
+    () => fileInput.files?.[0] && showPreview(fileInput.files[0]),
+  );
 
   form.onsubmit = async (e) => {
     e.preventDefault();
@@ -1681,7 +1998,8 @@ function openWallForm(existing) {
       if (mode === "url") {
         image = $("#wf_url").value.trim();
         if (!image) throw new Error("Image URL is required");
-        if (!/^https?:\/\//i.test(image)) throw new Error("Image URL must start with http:// or https://");
+        if (!/^https?:\/\//i.test(image))
+          throw new Error("Image URL must start with http:// or https://");
       } else {
         const f = fileInput.files?.[0];
         if (!f) throw new Error("Choose a file to upload");
@@ -1692,7 +2010,8 @@ function openWallForm(existing) {
         status.textContent = "Uploaded — saving…";
       }
 
-      if (isEdit) await api.patch(`/wallpapers/${existing.id}`, { name, image });
+      if (isEdit)
+        await api.patch(`/wallpapers/${existing.id}`, { name, image });
       else await api.post("/wallpapers", { name, image });
 
       if (previewUrl) URL.revokeObjectURL(previewUrl);
@@ -1727,7 +2046,9 @@ function resetSurahButtons() {
 async function recitersPage() {
   if (state.reciterSlug) return reciterDetailPage(state.reciterSlug);
 
-  const r = await apiCall(api.get("/reciters?limit=500"), { errorPrefix: "Load reciters" });
+  const r = await apiCall(api.get("/reciters?limit=500"), {
+    errorPrefix: "Load reciters",
+  });
   const items = r.items || [];
 
   const head = `<div class="eh">
@@ -1735,7 +2056,8 @@ async function recitersPage() {
       <div><h3>Reciters</h3><p>Quran audio — open a reciter to browse and play surahs</p></div>
     </div>`;
 
-  if (!items.length) return `<div class="card glass s12">${head}<div class="empty">No reciters yet.</div></div>`;
+  if (!items.length)
+    return `<div class="card glass s12">${head}<div class="empty">No reciters yet.</div></div>`;
 
   const rows = items
     .map(
@@ -1777,7 +2099,9 @@ async function reciterDetailPage(slug) {
   const subtitle = [
     reciter.bitrate ? `${reciter.bitrate} kbps` : null,
     `${surahs.length} surahs`,
-    reciter.total_ayahs ? `${reciter.total_ayahs.toLocaleString()} ayahs` : null,
+    reciter.total_ayahs
+      ? `${reciter.total_ayahs.toLocaleString()} ayahs`
+      : null,
   ]
     .filter(Boolean)
     .join(" · ");
@@ -1812,7 +2136,8 @@ async function reciterDetailPage(slug) {
 
 // ---- Gapless surah playback (Web Audio) -----------------------------------------
 let audioCtx = null;
-const getAudioCtx = () => (audioCtx ||= new (window.AudioContext || window.webkitAudioContext)());
+const getAudioCtx = () =>
+  (audioCtx ||= new (window.AudioContext || window.webkitAudioContext)());
 
 async function fetchAyahBuffer(sp, i) {
   const resp = await fetch(`${sp.host}/${sp.ayahList[i]}`, { mode: "cors" });
@@ -1854,7 +2179,9 @@ async function playReciterSurah(slug, surahNum, btn) {
   btn.disabled = true;
 
   try {
-    const r = await api.get(`/reciters/${encodeURIComponent(slug)}/surah/${surahNum}`);
+    const r = await api.get(
+      `/reciters/${encodeURIComponent(slug)}/surah/${surahNum}`,
+    );
     if (!r.ayah_list || !r.ayah_list.length) {
       toast("No audio for this surah", true);
       btn.innerHTML = ic("play");
@@ -1914,17 +2241,24 @@ async function scheduleSurah(sp) {
     sp.nextStartTime = startAt + buffer.duration;
     sp.sources.push(source);
 
-    setTimeout(() => {
-      if (alive() && sp.btn) sp.btn.title = `Playing ayah ${i + 1} of ${sp.ayahList.length}`;
-    }, Math.max(0, (startAt - ctx.currentTime) * 1000));
+    setTimeout(
+      () => {
+        if (alive() && sp.btn)
+          sp.btn.title = `Playing ayah ${i + 1} of ${sp.ayahList.length}`;
+      },
+      Math.max(0, (startAt - ctx.currentTime) * 1000),
+    );
 
     if (i === sp.ayahList.length - 1) {
-      setTimeout(() => {
-        if (state.surahPlayer !== sp) return;
-        state.surahPlayer = null;
-        sp.btn.innerHTML = ic("play");
-        sp.btn.title = "Play surah";
-      }, Math.max(0, (sp.nextStartTime - ctx.currentTime) * 1000));
+      setTimeout(
+        () => {
+          if (state.surahPlayer !== sp) return;
+          state.surahPlayer = null;
+          sp.btn.innerHTML = ic("play");
+          sp.btn.title = "Play surah";
+        },
+        Math.max(0, (sp.nextStartTime - ctx.currentTime) * 1000),
+      );
     }
   }
 }
@@ -1932,7 +2266,15 @@ async function scheduleSurah(sp) {
 // ============================================================================
 // Prayer Times
 // ============================================================================
-const PRAYER_FIELDS = ["imsak", "fajr_start", "sunrise", "zuhr_start", "asr_start", "maghrib_start", "isha_start"];
+const PRAYER_FIELDS = [
+  "imsak",
+  "fajr_start",
+  "sunrise",
+  "zuhr_start",
+  "asr_start",
+  "maghrib_start",
+  "isha_start",
+];
 const PRAYER_LABELS = {
   imsak: "Imsak",
   fajr_start: "Fajr",
@@ -1951,7 +2293,11 @@ async function prayerTimesPage() {
   }
 
   // Priority: explicit selection → detected location → dashboard selection → first city (flagged)
-  let city = state.prayerCityPage || matchCity(state.detected?.city)?.key || state.prayerCity || null;
+  let city =
+    state.prayerCityPage ||
+    matchCity(state.detected?.city)?.key ||
+    state.prayerCity ||
+    null;
   const usedFallback = !city;
   if (!city) city = cities[0].key;
 
@@ -1972,7 +2318,7 @@ async function prayerTimesPage() {
 
   const years = [];
   for (let y = 2000; y <= 2030; y++) years.push(y);
-  if (!years.includes(year)) years.push(year), years.sort((a, b) => a - b);
+  if (!years.includes(year)) (years.push(year), years.sort((a, b) => a - b));
 
   const head = `<div class="eh">
       <div class="ic">${ic("clock")}</div>
@@ -1996,15 +2342,22 @@ async function prayerTimesPage() {
     <div class="months" role="tablist">
       ${Array.from(
         { length: 12 },
-        (_, i) => `<button type="button" role="tab" class="${i === month ? "on" : ""}" data-act="prayer-month" data-m="${i}">
+        (
+          _,
+          i,
+        ) => `<button type="button" role="tab" class="${i === month ? "on" : ""}" data-act="prayer-month" data-m="${i}">
           ${new Date(2000, i, 1).toLocaleDateString("en-IN", { month: "short" })}</button>`,
       ).join("")}
     </div>`;
 
   let items = [];
   try {
-    const r = await api.get(`/prayer-times?city=${encodeURIComponent(city)}&from=${year}-01-01&to=${year}-12-31&limit=400`);
-    items = (r.items || []).filter((it) => parseInt((it.date || "").split("-")[1], 10) - 1 === month);
+    const r = await api.get(
+      `/prayer-times?city=${encodeURIComponent(city)}&from=${year}-01-01&to=${year}-12-31&limit=400`,
+    );
+    items = (r.items || []).filter(
+      (it) => parseInt((it.date || "").split("-")[1], 10) - 1 === month,
+    );
   } catch (e) {
     toast("Load failed: " + e.message, true);
   }
@@ -2034,7 +2387,8 @@ async function prayerTimesPage() {
 
   const rows = items
     .map((it) => {
-      const isFriday = it.is_friday === true || new Date(it.date + "T12:00:00").getDay() === 5;
+      const isFriday =
+        it.is_friday === true || new Date(it.date + "T12:00:00").getDay() === 5;
       const zuhr = isFriday
         ? `<td><span class="pill warn">Jummah</span> ${fmtTimeHtml(it.zuhr_start)}</td>`
         : `<td>${fmtTimeHtml(it.zuhr_start)}</td>`;
@@ -2058,11 +2412,18 @@ async function prayerTimesPage() {
 }
 
 async function prayerEdit(id) {
-  if (!can("prayer-times:write")) return toast("You don't have permission to edit prayer times", true);
-  const it = await apiCall(api.get(`/prayer-times/${id}`), { errorPrefix: "Load" });
+  if (!can("prayer-times:write"))
+    return toast("You don't have permission to edit prayer times", true);
+  const it = await apiCall(api.get(`/prayer-times/${id}`), {
+    errorPrefix: "Load",
+  });
   formModal({
     title: `Edit ${it.date}`,
-    fields: PRAYER_FIELDS.map((k) => ({ k, l: PRAYER_LABELS[k], h: "HH:MM (24-hour)" })),
+    fields: PRAYER_FIELDS.map((k) => ({
+      k,
+      l: PRAYER_LABELS[k],
+      h: "HH:MM (24-hour)",
+    })),
     data: it,
     onSubmit: async (vals) => {
       try {
@@ -2078,11 +2439,16 @@ async function prayerEdit(id) {
 }
 
 async function prayerSeed() {
-  if (!can("prayer-times:write")) return toast("You don't have permission to generate prayer times", true);
+  if (!can("prayer-times:write"))
+    return toast("You don't have permission to generate prayer times", true);
   await ensureCities();
   const city = state.prayerCityPage || state.prayerCity;
   const year = state.prayerYear || new Date().getFullYear();
-  if (!city) return toast("Pick a city first — we can't seed times for a location we don't know.", true);
+  if (!city)
+    return toast(
+      "Pick a city first — we can't seed times for a location we don't know.",
+      true,
+    );
 
   confirmBox({
     title: "Generate full year?",
@@ -2090,7 +2456,11 @@ async function prayerSeed() {
     ok: "Generate",
     onOk: async () => {
       try {
-        const r = await api.post("/prayer-times/seed", { city, year, replace: true });
+        const r = await api.post("/prayer-times/seed", {
+          city,
+          year,
+          replace: true,
+        });
         toast(`Seeded ${r.inserted} days, skipped ${r.skipped}`);
         await go("Prayer Times");
       } catch (e) {
@@ -2108,13 +2478,15 @@ async function prayerByCoordinate() {
 
   const lat = parseFloat(latEl.value);
   const lon = parseFloat(lonEl.value);
-  if (Number.isNaN(lat) || Number.isNaN(lon)) return toast("Enter valid coordinates", true);
+  if (Number.isNaN(lat) || Number.isNaN(lon))
+    return toast("Enter valid coordinates", true);
 
   out.innerHTML = `<div class="empty">${ic("refresh")} Fetching…</div>`;
   try {
     const d = await api.get(`/prayer-times/for-location?lat=${lat}&lon=${lon}`);
     const t = d.timings || {};
-    const row = (label, v, bold) => `<tr><td>${label}</td><td>${bold ? "<b>" : ""}${fmtTimeHtml(v)}${bold ? "</b>" : ""}</td></tr>`;
+    const row = (label, v, bold) =>
+      `<tr><td>${label}</td><td>${bold ? "<b>" : ""}${fmtTimeHtml(v)}${bold ? "</b>" : ""}</td></tr>`;
     out.innerHTML = `<div class="tw"><table class="kv-table">
         ${row("Fajr", t.fajr, 1)}${row("Sunrise", t.sunrise)}${row("Dhuhr", t.dhuhr, 1)}
         ${row("Asr", t.asr)}${row("Maghrib", t.maghrib, 1)}${row("Isha", t.isha, 1)}
@@ -2172,15 +2544,38 @@ function openPasswordModal() {
     title: "Change password",
     okLabel: "Change password",
     fields: [
-      { k: "current_password", l: "Current password", t: "password", req: 1, full: 1 },
-      { k: "new_password", l: "New password", t: "password", req: 1, full: 1, h: "Minimum 6 characters" },
-      { k: "confirm", l: "Confirm new password", t: "password", req: 1, full: 1 },
+      {
+        k: "current_password",
+        l: "Current password",
+        t: "password",
+        req: 1,
+        full: 1,
+      },
+      {
+        k: "new_password",
+        l: "New password",
+        t: "password",
+        req: 1,
+        full: 1,
+        h: "Minimum 6 characters",
+      },
+      {
+        k: "confirm",
+        l: "Confirm new password",
+        t: "password",
+        req: 1,
+        full: 1,
+      },
     ],
     onSubmit: async (vals) => {
-      if (vals.new_password.length < 6) return "New password must be at least 6 characters.";
+      if (vals.new_password.length < 6)
+        return "New password must be at least 6 characters.";
       if (vals.new_password !== vals.confirm) return "Passwords do not match.";
       try {
-        await api.post("/me/password", { current_password: vals.current_password, new_password: vals.new_password });
+        await api.post("/me/password", {
+          current_password: vals.current_password,
+          new_password: vals.new_password,
+        });
         toast("Password changed — please log in again");
         setTimeout(() => api.logout(), 1200);
         return null;
@@ -2220,7 +2615,9 @@ async function flushProfileSave() {
 }
 
 const twoFaCopy = (on) =>
-  on ? "A 6-digit code will be emailed on every sign-in." : "Admins sign in with just a password. Not recommended.";
+  on
+    ? "A 6-digit code will be emailed on every sign-in."
+    : "Admins sign in with just a password. Not recommended.";
 
 async function settingsPage() {
   await refreshMe();
@@ -2236,7 +2633,10 @@ async function settingsPage() {
   const isProd = api.config && api.config.env === "production";
   const canWriteSettings = can("settings:write");
 
-  const fullName = [me.first_name, me.last_name].filter(Boolean).join(" ").trim();
+  const fullName = [me.first_name, me.last_name]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
   const initials =
     (fullName || me.email || "A")
       .split(/\s+/)
@@ -2302,12 +2702,15 @@ async function settingsPage() {
 async function toggleTwoFa(btn) {
   const errEl = $("#tf-err");
   errEl.textContent = "";
-  if (!can("settings:write")) return toast("You don't have permission to change this setting", true);
+  if (!can("settings:write"))
+    return toast("You don't have permission to change this setting", true);
 
   const enable = !btn.classList.contains("on");
   btn.disabled = true;
   try {
-    await api.put("/settings/2fa_enabled", { value: enable ? "true" : "false" });
+    await api.put("/settings/2fa_enabled", {
+      value: enable ? "true" : "false",
+    });
     btn.classList.toggle("on", enable);
     btn.classList.toggle("off", !enable);
     btn.setAttribute("aria-pressed", String(enable));
@@ -2415,7 +2818,11 @@ function enqueueFiles(files) {
       toast(`${f.name}: max 10 MB`, true);
       continue;
     }
-    uploadQueue.push({ file: f, status: "pending", id: Math.random().toString(36).slice(2, 8) });
+    uploadQueue.push({
+      file: f,
+      status: "pending",
+      id: Math.random().toString(36).slice(2, 8),
+    });
   }
   renderUploadQueue();
 }
@@ -2516,7 +2923,8 @@ async function backupPage() {
       </div>`
     : "";
 
-  const locationPill = (s) => `<span class="pill ${s === "r2" ? "ok" : s === "both" ? "" : "off"}">${esc(s)}</span>`;
+  const locationPill = (s) =>
+    `<span class="pill ${s === "r2" ? "ok" : s === "both" ? "" : "off"}">${esc(s)}</span>`;
   const listCard = `<div class="card glass s12">
       <div class="ch"><div class="ic">${ic("book")}</div><div><b>Backup history</b><small>${plural(backups.length, "file")}</small></div></div>
       ${
@@ -2547,7 +2955,8 @@ async function backupPage() {
 }
 
 function backupRunNow() {
-  if (!can("backup:write")) return toast("You don't have permission to run backups", true);
+  if (!can("backup:write"))
+    return toast("You don't have permission to run backups", true);
   confirmBox({
     title: "Run database backup?",
     msg: "This runs scripts/backup.sh on the server and uploads the SQL dump to R2. It takes 5–15 seconds.",
@@ -2555,7 +2964,9 @@ function backupRunNow() {
     onOk: async () => {
       try {
         const r = await api.post("/admin/backup");
-        toast(`Backup created: ${r.filename} (${(r.size_bytes / 1024).toFixed(0)} KB)`);
+        toast(
+          `Backup created: ${r.filename} (${(r.size_bytes / 1024).toFixed(0)} KB)`,
+        );
         await go("Backup");
       } catch (e) {
         toast(e.message || "Backup failed", true);
@@ -2565,7 +2976,8 @@ function backupRunNow() {
 }
 
 function backupRestoreConfirm(filename) {
-  if (!can("backup:write")) return toast("You don't have permission to restore backups", true);
+  if (!can("backup:write"))
+    return toast("You don't have permission to restore backups", true);
   formModal({
     title: "Restore database backup?",
     okLabel: "Restore",
@@ -2579,9 +2991,13 @@ function backupRestoreConfirm(filename) {
       },
     ],
     onSubmit: async (vals) => {
-      if (vals.confirm !== "RESTORE") return "Type RESTORE exactly to continue.";
+      if (vals.confirm !== "RESTORE")
+        return "Type RESTORE exactly to continue.";
       try {
-        const r = await api.post("/admin/backup/restore", { filename, confirm: "RESTORE" });
+        const r = await api.post("/admin/backup/restore", {
+          filename,
+          confirm: "RESTORE",
+        });
         toast(`Restore started: ${r.status}`);
         return null;
       } catch (e) {
@@ -2715,7 +3131,9 @@ async function syncTick() {
 
   if (job) {
     try {
-      const logs = await api.get(`/admin/sync/ayah/logs?job_id=${job.id}&offset=${syncState.logOffset}`);
+      const logs = await api.get(
+        `/admin/sync/ayah/logs?job_id=${job.id}&offset=${syncState.logOffset}`,
+      );
       if (logs.exists && logs.chunk) syncAppendLog(logs.chunk);
       syncState.logOffset = logs.next_offset;
     } catch {}
@@ -2763,15 +3181,19 @@ async function syncPage() {
 }
 
 async function syncStartAction() {
-  if (!can("sync:write")) return toast("You don't have permission to start sync jobs", true);
+  if (!can("sync:write"))
+    return toast("You don't have permission to start sync jobs", true);
   const r = await api.post("/admin/sync/ayah/start", {});
-  toast(r.attached ? `Attached to job #${r.job_id}` : `Started job #${r.job_id}`);
+  toast(
+    r.attached ? `Attached to job #${r.job_id}` : `Started job #${r.job_id}`,
+  );
   syncReset();
   syncStartPolling();
 }
 
 async function syncStopAction() {
-  if (!can("sync:write")) return toast("You don't have permission to stop sync jobs", true);
+  if (!can("sync:write"))
+    return toast("You don't have permission to stop sync jobs", true);
   await api.post("/admin/sync/ayah/stop", {});
   toast("Stop requested — the job will halt after the current ayah");
   syncStartPolling();
@@ -2783,7 +3205,9 @@ async function syncStopAction() {
 async function devicesPage() {
   let users = [];
   try {
-    users = (await api.get("/administrators?include_guests=true&limit=500")).items || [];
+    users =
+      (await api.get("/administrators?include_guests=true&limit=500")).items ||
+      [];
   } catch (e) {
     return `<div class="card glass s12"><div class="empty">${esc(e.message || "Failed to load users")}</div></div>`;
   }
@@ -2794,7 +3218,8 @@ async function devicesPage() {
       <button type="button" class="b3" style="margin-inline-start:auto" data-act="reload">${ic("refresh")}Reload</button>
     </div>`;
 
-  if (!users.length) return `<div class="card glass s12">${head}<div class="empty">No users registered yet.</div></div>`;
+  if (!users.length)
+    return `<div class="card glass s12">${head}<div class="empty">No users registered yet.</div></div>`;
 
   const rows = users
     .map(
@@ -2856,7 +3281,11 @@ async function showUserDevices(userId) {
 // ============================================================================
 // Dhikr Campaigns
 // ============================================================================
-const dhikrState = { tab: "campaigns", activeCampaignId: null, statusFilter: "pending" };
+const dhikrState = {
+  tab: "campaigns",
+  activeCampaignId: null,
+  statusFilter: "pending",
+};
 
 async function dhikrCampaignsPage() {
   let campaigns = [];
@@ -2869,10 +3298,13 @@ async function dhikrCampaignsPage() {
   const statsMap = {};
   await Promise.all(
     campaigns.map(async (c) => {
-      statsMap[c.id] = await api.get(`/admin/dhikr/campaigns/${c.id}/stats`).catch(() => null);
+      statsMap[c.id] = await api
+        .get(`/admin/dhikr/campaigns/${c.id}/stats`)
+        .catch(() => null);
     }),
   );
-  const sum = (field) => Object.values(statsMap).reduce((n, s) => n + (s?.[field] || 0), 0);
+  const sum = (field) =>
+    Object.values(statsMap).reduce((n, s) => n + (s?.[field] || 0), 0);
   const totalSubmissions = sum("total_submissions");
   const totalDhikrs = sum("total_dhikrs");
   const totalPending = sum("pending");
@@ -2891,7 +3323,9 @@ async function dhikrCampaignsPage() {
     `<button type="button" class="${dhikrState.tab === id ? "on" : ""}" data-act="dhikr-tab" data-tab="${id}">${label}</button>`;
 
   const content =
-    dhikrState.tab === "campaigns" ? renderCampaignsList(campaigns, statsMap) : await renderSubmissionsTab(campaigns);
+    dhikrState.tab === "campaigns"
+      ? renderCampaignsList(campaigns, statsMap)
+      : await renderSubmissionsTab(campaigns);
 
   return `<div class="card glass s12">${head}</div>
     ${statCard("check", totalDhikrs, "Total dhikrs")}
@@ -2906,7 +3340,8 @@ async function dhikrCampaignsPage() {
 }
 
 function renderCampaignsList(campaigns, statsMap) {
-  if (!campaigns.length) return `<div class="empty">No campaigns yet. Click "New campaign" to create one.</div>`;
+  if (!campaigns.length)
+    return `<div class="empty">No campaigns yet. Click "New campaign" to create one.</div>`;
 
   const today = localISODate();
   const canWrite = can("dhikr-campaigns:write");
@@ -2951,7 +3386,10 @@ async function renderSubmissionsTab(campaigns) {
   dhikrState.activeCampaignId = cid;
 
   const campaignOpts = campaigns
-    .map((c) => `<option value="${c.id}"${c.id === cid ? " selected" : ""}>${esc(c.title)}</option>`)
+    .map(
+      (c) =>
+        `<option value="${c.id}"${c.id === cid ? " selected" : ""}>${esc(c.title)}</option>`,
+    )
     .join("");
   const statusOpts = [
     ["pending", "Pending"],
@@ -2959,13 +3397,20 @@ async function renderSubmissionsTab(campaigns) {
     ["rejected", "Rejected"],
     ["", "All statuses"],
   ]
-    .map(([v, l]) => `<option value="${v}"${dhikrState.statusFilter === v ? " selected" : ""}>${l}</option>`)
+    .map(
+      ([v, l]) =>
+        `<option value="${v}"${dhikrState.statusFilter === v ? " selected" : ""}>${l}</option>`,
+    )
     .join("");
 
   let data = { total: 0, items: [] };
   try {
-    const q = dhikrState.statusFilter ? `&status_filter=${dhikrState.statusFilter}` : "";
-    data = await api.get(`/admin/dhikr/campaigns/${cid}/submissions?limit=500${q}`);
+    const q = dhikrState.statusFilter
+      ? `&status_filter=${dhikrState.statusFilter}`
+      : "";
+    data = await api.get(
+      `/admin/dhikr/campaigns/${cid}/submissions?limit=500${q}`,
+    );
   } catch (e) {
     return `<div class="empty">${esc(e.message)}</div>`;
   }
@@ -3013,7 +3458,8 @@ async function renderSubmissionsTab(campaigns) {
 }
 
 function openCampaignForm(existing) {
-  if (!can("dhikr-campaigns:write")) return toast("You don't have permission to edit dhikr campaigns", true);
+  if (!can("dhikr-campaigns:write"))
+    return toast("You don't have permission to edit dhikr campaigns", true);
 
   const isEdit = !!existing;
   formModal({
@@ -3027,9 +3473,11 @@ function openCampaignForm(existing) {
       { k: "ends_on", l: "Ends on", req: 1, t: "date" },
     ],
     onSubmit: async (vals) => {
-      if (vals.ends_on < vals.starts_on) return "End date must be on or after the start date.";
+      if (vals.ends_on < vals.starts_on)
+        return "End date must be on or after the start date.";
       try {
-        if (isEdit) await api.patch(`/admin/dhikr/campaigns/${existing.id}`, vals);
+        if (isEdit)
+          await api.patch(`/admin/dhikr/campaigns/${existing.id}`, vals);
         else await api.post("/admin/dhikr/campaigns", vals);
         toast(isEdit ? "Updated" : "Created");
         await go("Dhikr Campaigns");
@@ -3080,7 +3528,7 @@ const PAGE_RENDERERS = {
   Invitations: invitationsPage,
   "Prayer Times": prayerTimesPage,
   Reciters: recitersPage,
-  Duas: () => crudPage("Duas"),
+  Duas: duasPage,
   Dhikrs: () => crudPage("Dhikrs"),
   Wallpapers: wallpapersPage,
   Uploads: uploadsPage,
@@ -3101,10 +3549,271 @@ async function detectAndRefresh() {
   } catch {}
 }
 
+let duaTab = "masnoon";
+let masCategory = "";
+const MAS_LANGS = [
+  ["en", "English"],
+  ["gu", "Gujarati"],
+  ["hi", "Hindi"],
+  ["ur", "Urdu"],
+  ["ar", "Arabic"],
+  ["sw", "Swahili"],
+];
+const statusPill = (active, yes = "Published", no = "Draft") =>
+  `<span class="pill ${active ? "" : "off"}">${active ? yes : no}</span>`;
+async function duasPage() {
+  const tabs = `<div class="card glass s12 content-tabs" aria-label="Dua collections">${[
+    ["masnoon", "Masnoon Duas"],
+    ["general", "General Duas"],
+    ["categories", "Categories"],
+  ]
+    .map(
+      ([k, l]) =>
+        `<button class="${duaTab === k ? "b2" : "b3"}" aria-pressed="${duaTab === k}" data-act="mas-tab" data-tab="${k}">${l}</button>`,
+    )
+    .join("")}</div>`;
+  if (duaTab === "general") return tabs + (await crudPage("Duas"));
+  const cats = await api.get("/admin/masnoon/categories");
+  const writable = can("duas:write");
+  if (duaTab === "categories")
+    return (
+      tabs +
+      `<div class="card glass s12"><div class="eh"><div><h3>Categories</h3><p>Organize supplications by occasion.</p></div>${writable ? '<button class="b2" data-act="mas-edit-cat">Add category</button>' : ""}</div><div class="category-grid">${cats.map((c) => `<button class="category-tile" data-act="mas-edit-cat" data-id="${c.id}"><small>Category ${c.position}</small><strong>${esc(c.title.en)}</strong><span>${esc(c.title.gu)}</span>${statusPill(c.is_active, "Active", "Inactive")}</button>`).join("") || '<p class="empty">No categories yet.</p>'}</div></div>`
+    );
+  const result = await api.get(
+    "/admin/masnoon/duas?limit=500" +
+      (masCategory ? "&category_id=" + encodeURIComponent(masCategory) : ""),
+  );
+  const items = result.items || [];
+  const published = items.filter((d) => d.is_published).length;
+  return (
+    tabs +
+    `<div class="card glass s12"><div class="eh"><div><h3>Masnoon Duas</h3><p>Manage multilingual supplications, recitations and publishing.</p></div>${writable ? '<button class="b2" data-act="mas-edit">Add entry</button>' : ""}</div><div class="content-metrics"><div><small>Loaded entries</small><strong>${items.length}</strong></div><div><small>Published</small><strong>${published}</strong></div><div><small>Drafts</small><strong>${items.length - published}</strong></div><div><small>Categories</small><strong>${cats.length}</strong></div></div><div class="tb"><div class="tb-field grow"><label for="mas-category">Category</label><select class="in" id="mas-category"><option value="">All categories</option>${cats.map((c) => `<option value="${c.id}" ${String(c.id) === masCategory ? "selected" : ""}>${esc(c.title.en)}</option>`).join("")}</select></div><button class="b3" data-act="mas-filter">Apply filter</button><div class="fld">${ic("search")}<input type="search" data-filter aria-label="Search loaded entries" placeholder="Search entries…"></div></div><div class="tw"><table><thead><tr><th>Order</th><th>Supplication</th><th>Category</th><th>Status</th><th>Action</th></tr></thead><tbody>${items.map((d) => `<tr><td>${d.position}</td><td class="wrap"><strong>${esc(d.title.en)}</strong><div class="content-secondary" dir="rtl">${esc(d.title.ar)}</div><small class="content-secondary">${esc(d.title.gu)}</small></td><td class="wrap">${esc(cats.find((c) => c.id === d.category_id)?.title.en || "Unknown")}</td><td>${statusPill(d.is_published)}</td><td><button class="b3" data-act="mas-edit" data-id="${d.id}">${writable ? "Edit" : "View"}</button></td></tr>`).join("")}</tbody></table>${items.length ? "" : '<div class="empty">No entries in this selection.</div>'}</div><div class="foot">${items.length} loaded · ${result.meta.total} matching</div>${writable ? '<details class="seed-tools"><summary>Dataset import tools</summary><p>Preview before applying. Manual edits are protected by the importer.</p><button class="b3" data-act="mas-preview">Preview seed</button> <button class="b3" data-act="mas-apply">Apply seed</button></details>' : ""}</div>`
+  );
+}
+async function masEdit(id, category = false) {
+  const base = "/admin/masnoon/" + (category ? "categories" : "duas");
+  const cats = await api.get("/admin/masnoon/categories");
+  const data = id
+    ? category
+      ? cats.find((c) => c.id === Number(id))
+      : await api.get(base + "/" + id)
+    : category
+      ? { slug: "", position: 1, title: {}, description: null, is_active: true }
+      : {
+          seed_key: "",
+          category_id: cats[0]?.id,
+          position: 1,
+          title: {},
+          content: { recitations: [] },
+          is_published: false,
+        };
+  if (!data) throw new Error("Entry not found");
+  const writable = can("duas:write");
+  const draft = JSON.parse(JSON.stringify(data));
+  let lang = "en";
+  const field = (label, key, value, area = false, rtl = false) =>
+    `<label class="editor-field"><span>${esc(label)}</span>${area ? `<textarea class="in" data-field="${key}" rows="4" ${rtl ? 'dir="rtl"' : ""} ${writable ? "" : "readonly"}>${esc(value ?? "")}</textarea>` : `<input class="in" data-field="${key}" value="${esc(value ?? "")}" ${rtl ? 'dir="rtl"' : ""} ${writable ? "" : "readonly"}>`}</label>`;
+  openModal(
+    `${modalHeader((writable ? (id ? "Edit " : "Add ") : "View ") + (category ? "category" : "supplication"))}<div class="mf content-editor"><div class="editor-meta">${!id ? field(category ? "Category slug" : "Seed key", "key", "") : ""}${field("Position", "position", draft.position)}${category ? "" : `<label class="editor-field"><span>Category</span><select id="mas-edit-category" class="in" ${writable ? "" : "disabled"}>${cats.map((c) => `<option value="${c.id}" ${c.id === draft.category_id ? "selected" : ""}>${esc(c.title.en)}</option>`).join("")}</select></label>`}<label class="editor-check"><input id="mas-published" type="checkbox" ${draft[category ? "is_active" : "is_published"] ? "checked" : ""} ${writable ? "" : "disabled"}>${category ? "Active category" : "Published in app"}</label></div><div id="mas-languages" class="content-tabs"></div><div id="mas-fields"></div>${category ? "" : `<details class="seed-tools"><summary>Advanced structured content (JSON)</summary><p>References, nested sections, instructions and source metadata. Apply JSON changes before saving.</p><textarea id="mas-json" class="in" rows="12" ${writable ? "" : "readonly"}></textarea>${writable ? '<button id="mas-json-apply" class="b3">Apply JSON changes</button>' : ""}</details>`}<div id="mas-error" class="err" role="alert"></div></div><div class="mfoot"><button class="b3" data-act="close">Close</button>${writable ? '<button class="btn" id="mas-save">Save changes</button>' : ""}</div>`,
+    "lg content-modal",
+  );
+  const error = $("#mas-error");
+  const render = () => {
+    $("#mas-languages").innerHTML = MAS_LANGS.map(
+      ([k, l]) =>
+        `<button type="button" class="${k === lang ? "b2" : "b3"}" data-lang="${k}" aria-pressed="${k === lang}">${l}</button>`,
+    ).join("");
+    const rtl = ["ar", "ur"].includes(lang);
+    let html = field("Title", "title", draft.title?.[lang], false, rtl);
+    if (category)
+      html += field(
+        "Description",
+        "description",
+        draft.description?.[lang],
+        true,
+        rtl,
+      );
+    else {
+      html += field(
+        "Occasion",
+        "occasion",
+        draft.content.occasion?.[lang],
+        true,
+        rtl,
+      );
+      html += (draft.content.recitations || [])
+        .map(
+          (r, i) =>
+            `<section class="recitation-editor"><h4>Recitation ${i + 1}</h4>${field("Arabic text", `arabic-${i}`, r.arabic, true, true)}${lang === "ar" ? "" : field("Pronunciation", `transliteration-${i}`, r.transliteration?.[lang], true, rtl)}${field("Meaning", `meaning-${i}`, r.meaning?.[lang], true, rtl)}${writable ? `<button class="b3" data-remove-rec="${i}">Remove recitation</button>` : ""}</section>`,
+        )
+        .join("");
+      if (writable)
+        html += '<button class="b3" id="mas-add-rec">Add recitation</button>';
+    }
+    $("#mas-fields").innerHTML = html;
+    if (!category)
+      $("#mas-json").value = JSON.stringify(draft.content, null, 2);
+  };
+  const collect = () => {
+    if (!writable) return;
+    for (const el of $$("[data-field]", $("#mas-fields"))) {
+      const k = el.dataset.field,
+        v = el.value;
+      if (k === "title") (draft.title ??= {})[lang] = v;
+      else if (k === "description") {
+        if (v || draft.description) (draft.description ??= {})[lang] = v;
+      } else if (k === "occasion") {
+        if (v || draft.content.occasion)
+          (draft.content.occasion ??= {})[lang] = v;
+      } else {
+        const [part, i] = k.split("-");
+        const r = draft.content.recitations[Number(i)];
+        if (part === "arabic") r.arabic = v;
+        else (r[part] ??= {})[lang] = v;
+      }
+    }
+  };
+  if (!category) {
+    const advanced = $("#mas-json").closest("details");
+    advanced.addEventListener("toggle", () => {
+      if (advanced.open) {
+        collect();
+        $("#mas-json").value = JSON.stringify(draft.content, null, 2);
+      }
+    });
+  }
+  $("#mas-languages").onclick = (e) => {
+    const b = e.target.closest("[data-lang]");
+    if (!b) return;
+    collect();
+    lang = b.dataset.lang;
+    render();
+  };
+  $("#mas-fields").onclick = (e) => {
+    if (!writable) return;
+    const b = e.target.closest("[data-remove-rec]");
+    if (e.target.id === "mas-add-rec") {
+      collect();
+      (draft.content.recitations ??= []).push({
+        order: (draft.content.recitations || []).length + 1,
+        arabic: "",
+        transliteration: {},
+        meaning: {},
+      });
+      render();
+    } else if (b && window.confirm("Remove this recitation?")) {
+      collect();
+      draft.content.recitations.splice(Number(b.dataset.removeRec), 1);
+      render();
+    }
+  };
+  if (!category && writable)
+    $("#mas-json-apply").onclick = () => {
+      try {
+        const x = JSON.parse($("#mas-json").value);
+        if (
+          !x ||
+          Array.isArray(x) ||
+          typeof x !== "object" ||
+          (x.recitations != null && !Array.isArray(x.recitations))
+        )
+          throw new Error(
+            "Expected a content object with a recitations array.",
+          );
+        draft.content = x;
+        render();
+        error.textContent = "";
+      } catch (e) {
+        error.textContent = e.message;
+      }
+    };
+  render();
+  const btn = $("#mas-save");
+  if (!btn) return;
+  btn.onclick = async () => {
+    btn.disabled = true;
+    error.textContent = "";
+    try {
+      collect();
+      const position = Number($('[data-field="position"]').value);
+      if (!Number.isInteger(position) || position < 1)
+        throw new Error("Position must be a positive integer.");
+      for (const [k, l] of MAS_LANGS)
+        if (!draft.title?.[k]?.trim())
+          throw new Error(l + " title is required.");
+      const body = { title: draft.title, position };
+      if (!id) {
+        const key = $('[data-field="key"]').value.trim();
+        if (!/^[a-z0-9_]+$/.test(key))
+          throw new Error(
+            "Use lowercase letters, digits and underscores for the identifier.",
+          );
+        body[category ? "slug" : "seed_key"] = key;
+      }
+      if (category) {
+        body.description = draft.description;
+        body.is_active = $("#mas-published").checked;
+      } else {
+        body.category_id = Number($("#mas-edit-category").value);
+        if (!body.category_id) throw new Error("Choose a category.");
+        body.is_published = $("#mas-published").checked;
+        body.content = {
+          ...draft.content,
+          id: id ? data.seed_key : body.seed_key,
+          title: draft.title,
+          entry_number: position,
+          category_slug: cats.find((c) => c.id === body.category_id)?.slug,
+        };
+        if (
+          body.is_published &&
+          !window.confirm(
+            "Confirm religious review is complete before publishing this content.",
+          )
+        )
+          return;
+      }
+      if (id) await api.patch(base + "/" + id, body);
+      else await api.post(base, body);
+      closeModal();
+      toast("Saved");
+      await go("Duas");
+    } catch (e) {
+      error.textContent = e.message;
+    } finally {
+      btn.disabled = false;
+    }
+  };
+}
+
 const ACTIONS = {
+  "mas-tab": async (el) => {
+    duaTab = el.dataset.tab;
+    await go("Duas");
+  },
+  "mas-filter": async () => {
+    masCategory = $("#mas-category").value;
+    await go("Duas");
+  },
+  "mas-edit": (el) => masEdit(el.dataset.id),
+  "mas-edit-cat": (el) => masEdit(el.dataset.id, true),
+  "mas-preview": async () => {
+    const r = await api.post("/admin/masnoon/seed/preview", {});
+    openModal(
+      `${modalHeader("Seed preview")}<div class="mf"><pre>${esc(JSON.stringify(r, null, 2))}</pre></div><div class="mfoot"><button class="b3" data-act="close">Close</button></div>`,
+    );
+  },
+  "mas-apply": async () => {
+    if (!window.confirm("Import bundled dataset? Manual edits are preserved."))
+      return;
+    const r = await api.post("/admin/masnoon/seed/apply", {});
+    toast(JSON.stringify(r));
+    await go("Duas");
+  },
   // Navigation / shell
   go: async (el) => {
     const page = el.dataset.p;
+    if (page === "Duas" && el.dataset.then === "add") duaTab = "general";
     await go(page);
     if (el.dataset.then !== "add") return;
     if (CRUD[page]) await openCrudForm(page, null);
@@ -3136,8 +3845,14 @@ const ACTIONS = {
 
   // Generic CRUD
   "crud-add": (el) => openCrudForm(el.dataset.key, null),
-  "crud-edit": (el) => openCrudForm(el.dataset.key, parseInt(el.dataset.id, 10)),
-  "crud-del": (el) => confirmDelete(el.dataset.key, parseInt(el.dataset.id, 10), el.dataset.label || "item"),
+  "crud-edit": (el) =>
+    openCrudForm(el.dataset.key, parseInt(el.dataset.id, 10)),
+  "crud-del": (el) =>
+    confirmDelete(
+      el.dataset.key,
+      parseInt(el.dataset.id, 10),
+      el.dataset.label || "item",
+    ),
 
   // Administrators / invitations
   "invite-open": () => openInviteForm(),
@@ -3176,7 +3891,11 @@ const ACTIONS = {
       onOk: async () => {
         try {
           await api.post(`/admin/invitations/reinvite/${id}`, {});
-          toast(pending ? "Invitation resent" : "Re-invite sent — status set to pending");
+          toast(
+            pending
+              ? "Invitation resent"
+              : "Re-invite sent — status set to pending",
+          );
           await go("Administrators");
         } catch (e) {
           toast(e.message || "Re-invite failed", true);
@@ -3194,12 +3913,17 @@ const ACTIONS = {
     await openRoleForm(role);
   },
   "role-delete": (el) =>
-    confirmDeleteRole(parseInt(el.dataset.id, 10), el.dataset.name || "role", parseInt(el.dataset.users || "0", 10)),
+    confirmDeleteRole(
+      parseInt(el.dataset.id, 10),
+      el.dataset.name || "role",
+      parseInt(el.dataset.users || "0", 10),
+    ),
 
   // Wallpapers / uploads
   "wall-add": () => openWallForm(null),
   "wall-preview": (el) => wallPreview(parseInt(el.dataset.id, 10)),
-  "wall-edit": async (el) => openWallForm(await api.get(`/wallpapers/${parseInt(el.dataset.id, 10)}`)),
+  "wall-edit": async (el) =>
+    openWallForm(await api.get(`/wallpapers/${parseInt(el.dataset.id, 10)}`)),
   "wall-del": (el) =>
     confirmBox({
       title: "Delete wallpaper?",
@@ -3231,7 +3955,8 @@ const ACTIONS = {
     stopAudio();
     await go("Reciters");
   },
-  "reciter-play-surah": (el) => playReciterSurah(el.dataset.slug, parseInt(el.dataset.n, 10), el),
+  "reciter-play-surah": (el) =>
+    playReciterSurah(el.dataset.slug, parseInt(el.dataset.n, 10), el),
 
   // Prayer times
   "prayer-edit": (el) => prayerEdit(parseInt(el.dataset.id, 10)),
@@ -3310,13 +4035,15 @@ const ACTIONS = {
     toast("Campaign toggled");
     await go("Dhikr Campaigns");
   },
-  "dhikr-delete": (el) => confirmDeleteCampaign(el.dataset.id, el.dataset.title),
+  "dhikr-delete": (el) =>
+    confirmDeleteCampaign(el.dataset.id, el.dataset.title),
   "dhikr-disable": async (el) => {
     const id = parseInt(el.dataset.id, 10);
     closeModal();
     const all = await api.get("/admin/dhikr/campaigns");
     const found = all.find((c) => c.id === id);
-    if (found && found.is_active) await api.post(`/admin/dhikr/campaigns/${id}/toggle`);
+    if (found && found.is_active)
+      await api.post(`/admin/dhikr/campaigns/${id}/toggle`);
     toast("Campaign disabled — submissions preserved");
     await go("Dhikr Campaigns");
   },
@@ -3351,7 +4078,10 @@ document.addEventListener("click", async (e) => {
 
 // Wallpaper tiles act as buttons — make them keyboard accessible
 document.addEventListener("keydown", (e) => {
-  if ((e.key === "Enter" || e.key === " ") && e.target.matches?.('.wp[data-act="wall-preview"]')) {
+  if (
+    (e.key === "Enter" || e.key === " ") &&
+    e.target.matches?.('.wp[data-act="wall-preview"]')
+  ) {
     e.preventDefault();
     e.target.click();
   }
@@ -3373,7 +4103,10 @@ document.addEventListener("input", (e) => {
     if (ok) shown++;
   });
   const foot = $(".foot", card);
-  if (foot) foot.textContent = q ? `${shown} of ${rows.length} shown` : `${rows.length} total`;
+  if (foot)
+    foot.textContent = q
+      ? `${shown} of ${rows.length} shown`
+      : `${rows.length} total`;
 });
 
 // ---- Change: selects + avatar -------------------------------------------------------
@@ -3394,7 +4127,9 @@ document.addEventListener("change", async (e) => {
       state.prayerCity = x.value;
       state.prayerCityPage = x.value;
       savePrayerCityPref(x.value);
-      toast(`📍 Prayer city set to ${x.options[x.selectedIndex]?.text || x.value}`);
+      toast(
+        `📍 Prayer city set to ${x.options[x.selectedIndex]?.text || x.value}`,
+      );
       await go(x.dataset.change === "np-city" ? "Dashboard" : "Prayer Times");
       break;
     }
@@ -3415,7 +4150,9 @@ document.addEventListener("change", async (e) => {
 
 // ---- Keyboard ---------------------------------------------------------------------------
 document.addEventListener("keydown", (e) => {
-  const mod = navigator.platform.toUpperCase().includes("MAC") ? e.metaKey : e.ctrlKey;
+  const mod = navigator.platform.toUpperCase().includes("MAC")
+    ? e.metaKey
+    : e.ctrlKey;
   if (mod && e.key.toLowerCase() === "k") {
     e.preventDefault();
     paletteOpen ? closePalette() : openPalette();
@@ -3425,21 +4162,6 @@ document.addEventListener("keydown", (e) => {
   if (paletteOpen) closePalette();
   else if (modalOpen()) closeModal();
   else if (document.body.classList.contains("open")) setMenu(false);
-});
-
-// ---- Card glow (mouse-follow gradient) ---------------------------------------------------
-let glowQueued = false;
-document.addEventListener("mousemove", (e) => {
-  if (glowQueued) return;
-  glowQueued = true;
-  requestAnimationFrame(() => {
-    glowQueued = false;
-    const card = e.target.closest?.(".card");
-    if (!card) return;
-    const r = card.getBoundingClientRect();
-    card.style.setProperty("--mx", e.clientX - r.left + "px");
-    card.style.setProperty("--my", e.clientY - r.top + "px");
-  });
 });
 
 // ============================================================================
@@ -3452,17 +4174,59 @@ let paletteIndex = 0;
 const PALETTE_COMMANDS = [
   { title: "Dashboard", icon: "dash", run: () => go("Dashboard") },
   { title: "Settings", icon: "set", run: () => go("Settings") },
-  { title: "Backup", icon: "down", perm: "backup:read", run: () => go("Backup") },
-  { title: "Sync Quran audio", icon: "refresh", perm: "sync:read", run: () => go("Sync") },
+  {
+    title: "Backup",
+    icon: "down",
+    perm: "backup:read",
+    run: () => go("Backup"),
+  },
+  {
+    title: "Sync Quran audio",
+    icon: "refresh",
+    perm: "sync:read",
+    run: () => go("Sync"),
+  },
   { title: "Change password", icon: "shield", run: () => openPasswordModal() },
-  { title: "Run backup now", icon: "refresh", perm: "backup:write", run: () => backupRunNow() },
-  { title: "New dua", icon: "plus", perm: "duas:write", run: async () => (await go("Duas"), openCrudForm("Duas", null)) },
-  { title: "New dhikr", icon: "plus", perm: "dhikrs:write", run: async () => (await go("Dhikrs"), openCrudForm("Dhikrs", null)) },
-  { title: "New wallpaper", icon: "plus", perm: "wallpapers:write", run: async () => (await go("Wallpapers"), openWallForm(null)) },
-  { title: "Create role", icon: "plus", perm: "roles:write", run: () => openRoleForm(null) },
+  {
+    title: "Run backup now",
+    icon: "refresh",
+    perm: "backup:write",
+    run: () => backupRunNow(),
+  },
+  {
+    title: "New dua",
+    icon: "plus",
+    perm: "duas:write",
+    run: async () => (await go("Duas"), openCrudForm("Duas", null)),
+  },
+  {
+    title: "New dhikr",
+    icon: "plus",
+    perm: "dhikrs:write",
+    run: async () => (await go("Dhikrs"), openCrudForm("Dhikrs", null)),
+  },
+  {
+    title: "New wallpaper",
+    icon: "plus",
+    perm: "wallpapers:write",
+    run: async () => (await go("Wallpapers"), openWallForm(null)),
+  },
+  {
+    title: "Create role",
+    icon: "plus",
+    perm: "roles:write",
+    run: () => openRoleForm(null),
+  },
 ];
 
-const HIT_ICONS = { dua: "heart", dhikr: "beads", wallpaper: "img", reciter: "head", translator: "globe", admin: "shield" };
+const HIT_ICONS = {
+  dua: "heart",
+  dhikr: "beads",
+  wallpaper: "img",
+  reciter: "head",
+  translator: "globe",
+  admin: "shield",
+};
 
 function openPalette() {
   if (paletteOpen) return;
@@ -3492,7 +4256,9 @@ function openPalette() {
     const move = (delta) => {
       e.preventDefault();
       paletteIndex = (paletteIndex + delta + items.length) % items.length;
-      items.forEach((el, i) => el.classList.toggle("active", i === paletteIndex));
+      items.forEach((el, i) =>
+        el.classList.toggle("active", i === paletteIndex),
+      );
       items[paletteIndex].scrollIntoView({ block: "nearest" });
     };
     if (e.key === "ArrowDown") move(1);
@@ -3519,12 +4285,16 @@ async function renderPaletteResults(query) {
   paletteIndex = 0;
 
   const q = query.trim().toLowerCase();
-  const commands = PALETTE_COMMANDS.filter((c) => (!c.perm || can(c.perm)) && (!q || c.title.toLowerCase().includes(q)));
+  const commands = PALETTE_COMMANDS.filter(
+    (c) =>
+      (!c.perm || can(c.perm)) && (!q || c.title.toLowerCase().includes(q)),
+  );
 
   let hits = [];
   if (q.length >= 2) {
     try {
-      hits = (await api.get(`/search?q=${encodeURIComponent(q)}`)).results || [];
+      hits =
+        (await api.get(`/search?q=${encodeURIComponent(q)}`)).results || [];
     } catch {}
   }
   if (!$("#palette-results")) return; // closed while searching
@@ -3547,7 +4317,10 @@ async function renderPaletteResults(query) {
         <span class="pi-tag">${esc(h.page)}</span></div>`),
     );
   }
-  if (!commands.length && !hits.length) html.push(`<div class="palette-empty">No results for "${esc(query)}"</div>`);
+  if (!commands.length && !hits.length)
+    html.push(
+      `<div class="palette-empty">No results for "${esc(query)}"</div>`,
+    );
 
   results.innerHTML = html.join("");
   $$(".palette-item", results).forEach((el) =>
@@ -3598,7 +4371,10 @@ function enhanceSelect(sel) {
     trigger.innerHTML = `<span class="csel-val">${esc(cur ? cur.text : "")}</span>
       <svg class="csel-chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>`;
     popup.innerHTML = [...sel.options]
-      .map((o) => `<button type="button" class="csel-opt${o.selected ? " on" : ""}" role="option" data-v="${esc(o.value)}">${esc(o.text)}</button>`)
+      .map(
+        (o) =>
+          `<button type="button" class="csel-opt${o.selected ? " on" : ""}" role="option" data-v="${esc(o.value)}">${esc(o.text)}</button>`,
+      )
       .join("");
   };
   const close = () => {
@@ -3628,12 +4404,15 @@ function enhanceSelect(sel) {
   });
 
   if (sel.id) {
-    document.querySelector(`label[for="${sel.id}"]`)?.addEventListener("click", () => trigger.focus());
+    document
+      .querySelector(`label[for="${sel.id}"]`)
+      ?.addEventListener("click", () => trigger.focus());
   }
   render();
 }
 
-const enhanceAllSelects = (root = document) => $$("select.in", root).forEach(enhanceSelect);
+const enhanceAllSelects = (root = document) =>
+  $$("select.in", root).forEach(enhanceSelect);
 
 // ============================================================================
 // Init
@@ -3672,7 +4451,8 @@ async function init() {
     $('[data-act="lang"]')?.remove(); // language switcher is unused
 
     // Restore sidebar state (desktop)
-    if (!isMobile() && store.get("nea:rail") === "1") document.body.classList.add("rail");
+    if (!isMobile() && store.get("nea:rail") === "1")
+      document.body.classList.add("rail");
 
     // City catalogue first — needed to match the detected location
     setBoot("Loading cities…");
@@ -3706,7 +4486,10 @@ async function init() {
 
     setBoot("Finishing up…");
     if (state.dashboardReady) {
-      await Promise.race([state.dashboardReady, new Promise((r) => setTimeout(r, 4000))]);
+      await Promise.race([
+        state.dashboardReady,
+        new Promise((r) => setTimeout(r, 4000)),
+      ]);
     }
     await minVisible;
     finishBoot();
@@ -3725,3 +4508,84 @@ async function init() {
 }
 
 init();
+
+
+
+
+/* ULTRA GLASS — Unified Spotlight Engine */
+(() => {
+    "use strict";
+
+    if (window.__neaSpotlight) return;
+    window.__neaSpotlight = true;
+
+    const selector = [
+        ".card:not(.hero)",
+        ".category-tile",
+        "nav a:not(.act)",
+        ".seg button:not(.on)",
+        ".chip",
+        ".csel-opt",
+        ".qa button",
+        ".b3:not(.danger)",
+        ".tool"
+    ].join(",");
+
+    let active = null;
+    let pending = null;
+    let frame = 0;
+    let x = 0;
+    let y = 0;
+
+    function clear() {
+        active?.classList.remove("spotlight-active");
+        active = null;
+        pending = null;
+    }
+
+    document.addEventListener("pointermove", (e) => {
+        if (e.pointerType === "touch") return;
+        if (!(e.target instanceof Element)) return;
+
+        pending = e.target.closest(selector);
+
+        if (pending?.closest("[disabled], [aria-disabled='true']")) {
+            pending = null;
+        }
+
+        x = e.clientX;
+        y = e.clientY;
+
+        if (frame) return;
+
+        frame = requestAnimationFrame(() => {
+            frame = 0;
+
+            if (active !== pending) {
+                active?.classList.remove("spotlight-active");
+                active = pending;
+            }
+
+            if (!active?.isConnected) {
+                clear();
+                return;
+            }
+
+            const rect = active.getBoundingClientRect();
+
+            active.style.setProperty("--mx", `${x - rect.left}px`);
+            active.style.setProperty("--my", `${y - rect.top}px`);
+
+            active.classList.add(
+                "glass-spotlight",
+                "spotlight-active"
+            );
+        });
+    }, { passive: true });
+
+    document.addEventListener("pointerout", (e) => {
+        if (!e.relatedTarget) clear();
+    });
+
+    window.addEventListener("blur", clear);
+})();

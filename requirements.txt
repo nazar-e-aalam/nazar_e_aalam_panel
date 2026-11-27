@@ -8,7 +8,7 @@ python-dotenv==1.0.1
 passlib[bcrypt]==1.7.4
 bcrypt==4.2.1
 pyjwt==2.15.1
-alembic==1.13.3
+# alembic==1.13.3
 boto3==1.35.90
 hijridate==2.3.0
 beautifulsoup4==4.12.3

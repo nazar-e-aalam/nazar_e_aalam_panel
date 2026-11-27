@@ -22,6 +22,7 @@ from routes import (
     administrator_router,
     auth_router,
     c_dhikr_router,
+    masnoon_dua_router,
     dhikr_router,
     dua_router,
     hijri_router,
@@ -38,6 +39,11 @@ from routes import (
     wallpaper_router,
 )
 from seed import seed_default_roles, seed_initial_admin
+from tools.seed_masnoon_duas import (
+    initialize,
+    seed
+)
+from tools.seed_dhikr import seed as seed_dhikr
 from tools.seed_chapters import run as seed_chapters
 
 logger = setup_logging()
@@ -46,37 +52,6 @@ log = logger
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    from tools.migrate import (
-        assert_up_to_date,
-        current_revision,
-        head_revision,
-        is_up_to_date,
-    )
-
-    if ENV.is_production():
-        assert_up_to_date()
-        log.info(f"[db] {current_revision()}")
-
-    else:
-        inspector = inspect(__import__("database").db.engine)
-
-        if not inspector.has_table("users"):
-            log.info("[db] fresh database — creating schema via create_all")
-            init_db()
-
-            from alembic import command
-            from tools.migrate import _config
-
-            command.stamp(_config(), "head")
-            log.info("[db] fresh schema stamped to alembic head")
-
-        if not is_up_to_date():
-            log.warning(
-                f"[db] ⚠ schema behind migrations — "
-                f"current={current_revision()} head={head_revision()} "
-                f"→ run `alembic upgrade head`"
-            )
-
     seed_initial_admin()
     seed_default_roles()
 
@@ -90,6 +65,13 @@ async def lifespan(app: FastAPI):
         log.warning(f"[seed] reciters failed: {e}")
 
     seed_chapters()
+    
+    print('seeding masnoon dua')
+    initialize()
+    seed()
+
+    print('seeding masnoon dhikr')
+    seed_dhikr(apply=True)
 
     try:
         from tools.ayah_sync_runner import recover_orphans
@@ -247,6 +229,7 @@ app.include_router(panel_config_router)
 app.include_router(auth_router)
 app.include_router(me_router)
 app.include_router(dua_router)
+app.include_router(masnoon_dua_router)
 app.include_router(dhikr_router)
 app.include_router(wallpaper_router)
 app.include_router(reciter_router)

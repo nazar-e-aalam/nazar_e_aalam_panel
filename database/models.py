@@ -820,3 +820,26 @@ class OtpChallenge(TimestampMixin, Base):
 
     def __repr__(self) -> str:
         return f"<OtpChallenge(id={self.id}, user_id={self.user_id}, attempts={self.attempts})>"
+
+
+class DuaCategory(TimestampMixin, Base):
+    __tablename__ = "dua_categories"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    slug: Mapped[str] = mapped_column(String(150), unique=True)
+    position: Mapped[int] = mapped_column(Integer, nullable=False)
+    title: Mapped[dict] = mapped_column(JSON, nullable=False)
+    description: Mapped[dict | None] = mapped_column(JSON)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    seed_hash: Mapped[str | None] = mapped_column(String(64))
+
+
+class MasnoonDua(TimestampMixin, Base):
+    __tablename__ = "masnoon_duas"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    seed_key: Mapped[str] = mapped_column(String(190), unique=True)
+    category_id: Mapped[int] = mapped_column(ForeignKey("dua_categories.id", ondelete="RESTRICT"), index=True)
+    position: Mapped[int] = mapped_column(Integer, nullable=False)
+    title: Mapped[dict] = mapped_column(JSON, nullable=False)
+    content: Mapped[dict] = mapped_column(JSON, nullable=False)
+    is_published: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    seed_hash: Mapped[str | None] = mapped_column(String(64))

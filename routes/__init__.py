@@ -19,12 +19,14 @@ from routes.search import router as search_router
 from routes.setting import router as setting_router
 from routes.sync import router as sync_router
 from routes.wallpaper import router as wallpaper_router
+from routes.masnoon_dua import router as masnoon_dua_router
 
 __all__ = [
     "admin_backup_router",
     "admin_devices_router",
     "admin_dhikr_router",
     "admin_invitations_router",
+    "masnoon_dua_router",
     "administrator_router",
     "auth_router",
     "c_dhikr_router",
