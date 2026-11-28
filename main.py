@@ -271,16 +271,10 @@ if _FRONTEND.is_dir():
 
 @app.get("/health")
 def health() -> dict:
-    from tools.migrate import current_revision, head_revision
-
     return {
         "status": "ok",
         "env": ENV.APP_ENV,
         "version": ENV.APP_VERSION,
         "docs": ENV.show_docs(),
         "debug": ENV.is_debug(),
-        "alembic": {
-            "current": current_revision(),
-            "head": head_revision(),
-        },
     }
